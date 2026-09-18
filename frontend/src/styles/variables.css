@@ -1,101 +1,121 @@
 :root {
-  /* Polar Operations Deck - Ocean & Abyssal Foundation */
+  /* =========================================================================
+     POLARNEXUS — Polar Operations Deck Design Tokens (from DESIGN.md)
+     ========================================================================= */
+
+  /* Abyssal Foundation & Surface Layering */
+  --surface-deep: #040914;
+  --surface-mid: #081325;
+  --surface-elevated: #0f1d36;
+  --surface-overlay: rgba(15, 29, 54, 0.72);
+  --surface-modal: rgba(4, 9, 20, 0.94);
+
   --bg-space: #010d26;
   --bg-primary: #04132c;
   --bg-secondary: #0d1b34;
   --bg-tertiary: #111f38;
   --surface-base: #111f38;
-  --surface-elevated: #1c2a43;
-  --surface-overlay: rgba(13, 27, 52, 0.75);
   --surface-subtle: #27354f;
 
-  /* Liquid Glass Core Tokens */
-  --glass-bg: rgba(17, 31, 56, 0.55);
-  --glass-bg-hover: rgba(28, 42, 67, 0.68);
-  --glass-bg-active: rgba(39, 53, 79, 0.8);
-  --glass-border: rgba(123, 208, 255, 0.18);
-  --glass-border-hover: rgba(142, 213, 255, 0.42);
-  --glass-border-subtle: rgba(255, 255, 255, 0.08);
-  --glass-blur: blur(16px);
-  --glass-blur-lg: blur(24px);
-  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 16px 0 rgba(123, 208, 255, 0.04);
-  --glass-specular-accent: inset 0 1px 2px 0 rgba(255, 255, 255, 0.22), inset 0 0 20px 0 rgba(56, 189, 248, 0.12);
-  
-  /* Borders & Grids */
-  --border-subtle: rgba(62, 72, 79, 0.45);
-  --border-medium: rgba(135, 146, 154, 0.3);
-  --border-accent: rgba(123, 208, 255, 0.4);
-  --border-tech: rgba(142, 213, 255, 0.35);
+  /* Material Design 3 Tactical Surface Tokens */
+  --surface-dim: #04132c;
+  --surface-bright: #2c3953;
+  --surface-container-lowest: #010d26;
+  --surface-container-low: #0d1b34;
+  --surface-container: #111f38;
+  --surface-container-high: #1c2a43;
+  --surface-container-highest: #27354f;
 
-  /* Typography */
-  --text-primary: #d8e2ff;
-  --text-secondary: #bdc8d1;
-  --text-muted: #87929a;
+  /* Text & Readability (Luminance preserving dark adaptation) */
+  --on-surface: #d8e2ff;
+  --on-surface-variant: #bdc8d1;
+  --text-primary: #f0f6fc;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
   --text-inverse: #04132c;
 
-  /* Polar Accents (Glacial Signals) */
+  /* Polar Signal & Telemetry Tiers (Primary / Secondary) */
+  --primary: #8ed5ff;
+  --primary-container: #38bdf8;
+  --on-primary: #00354a;
+  --secondary: #89ceff;
+  --secondary-container: #00a2e6;
+  --accent-cyan: #38bdf8;
+  --accent-ocean: #0ea5e9;
+  --accent-trench: #0284c7;
   --accent-ice: #7bd0ff;
-  --accent-ice-dim: rgba(123, 208, 255, 0.16);
-  --accent-ocean: #38bdf8;
-  --accent-polar: #e6f3ff;
-  --accent-cyan: #8ed5ff;
+  --accent-ice-dim: rgba(56, 189, 248, 0.16);
 
-  /* Scientific Risk Scales */
+  /* Polar Alert Tier (Tertiary, Semantic & Warning) */
+  --tertiary: #ffc174;
+  --tertiary-container: #f59e0b;
   --risk-low: #10b981;
   --risk-low-bg: rgba(16, 185, 129, 0.14);
   --risk-moderate: #f59e0b;
-  --risk-moderate-bg: rgba(245, 158, 11, 0.14);
+  --risk-moderate-bg: rgba(245, 158, 11, 0.15);
   --risk-high: #ffb4ab;
   --risk-high-bg: rgba(255, 180, 171, 0.16);
   --risk-critical: #ef4444;
   --risk-critical-bg: rgba(239, 68, 68, 0.22);
+  --error: #ffb4ab;
+  --error-container: #93000a;
 
-  /* Sea Ice Concentration Scale */
-  --ice-0-20: #0e274d;
-  --ice-20-40: #1d4b82;
-  --ice-40-60: #3880b9;
-  --ice-60-80: #7bd0ff;
-  --ice-80-100: #eaf6ff;
+  /* Structural Outlines & Radar Graticules */
+  --outline: #87929a;
+  --outline-variant: #3e484f;
+  --border-structural: rgba(30, 41, 59, 0.75);
+  --border-subtle: rgba(56, 189, 248, 0.14);
+  --border-medium: rgba(56, 189, 248, 0.28);
+  --border-accent: #38bdf8;
 
-  /* Fonts */
-  --font-sans: 'Space Grotesk', 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Space Mono', 'SFMono-Regular', Menlo, monospace;
+  /* Instrumental Glassmorphism */
+  --glass-bg: rgba(15, 29, 54, 0.72);
+  --glass-bg-hover: rgba(28, 42, 67, 0.82);
+  --glass-bg-active: rgba(39, 53, 79, 0.9);
+  --glass-border: rgba(56, 189, 248, 0.18);
+  --glass-border-hover: rgba(56, 189, 248, 0.45);
+  --glass-blur: blur(12px);
+  --glass-blur-lg: blur(20px);
+  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 16px 0 rgba(56, 189, 248, 0.05);
 
-  /* Smooth Rounded Borders everywhere */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  /* Typography Stacks */
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: var(--font-body);
+
+  /* Tactical Soft Technical Corner Radii (roundedness: 1) */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
   --radius-pill: 9999px;
 
-  /* Liquid Glass Elevations & Drops */
-  --shadow-subtle: 0 4px 12px rgba(1, 13, 38, 0.45);
-  --shadow-panel: 0 8px 32px 0 rgba(1, 13, 38, 0.65), 0 2px 6px 0 rgba(0, 0, 0, 0.4);
-  --shadow-overlay: 0 16px 48px 0 rgba(1, 13, 38, 0.85), 0 4px 16px 0 rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 24px rgba(56, 189, 248, 0.25);
-
-  /* Header / Sidebar Dimensions */
-  --header-height: 56px;
+  /* Dimensions */
+  --header-height: 54px;
   --strip-height: 38px;
   --sidebar-width: 250px;
-  --sidebar-collapsed-width: 68px;
+  --sidebar-collapsed-width: 62px;
+  --bottom-strip-height: 44px;
+
+  /* Elevation Shadows */
+  --shadow-panel: 0 8px 32px 0 rgba(1, 9, 20, 0.65), 0 2px 6px 0 rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.22);
+  --shadow-threat: 0 0 0 1px #ef4444, inset 0 0 16px rgba(239, 68, 68, 0.18);
 }
 
 /* High Contrast Mode */
 [data-contrast="high"] {
-  --bg-primary: #00040f;
-  --bg-secondary: #02091c;
-  --surface-base: #061229;
-  --surface-elevated: #0b1a38;
-  --border-subtle: #4972a5;
-  --border-medium: #709fd4;
+  --surface-deep: #00040a;
+  --surface-mid: #020815;
+  --surface-elevated: #061226;
+  --border-structural: #475569;
   --text-primary: #ffffff;
-  --text-secondary: #cde0ff;
-  --text-muted: #95b3db;
+  --text-secondary: #cbd5e1;
 }
 
-/* Reduced Motion Mode */
+/* Reduced Motion */
 [data-reduced-motion="true"] * {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;

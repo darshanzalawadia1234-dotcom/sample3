@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Radio,
-  Shuffle
+  Shuffle,
+  Anchor
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -24,11 +25,12 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
 
   const navItems = [
     { to: '/dashboard', label: 'OVERVIEW', icon: Compass, exact: true },
-    { to: '/sea-ice', label: 'SEA ICE', icon: Layers },
+    { to: '/navigation', label: 'TACTICAL ROUTE', icon: NavigationIcon },
     { to: '/icebergs', label: 'ICEBERGS', icon: TriangleAlert },
-    { to: '/navigation', label: 'NAVIGATION', icon: NavigationIcon },
-    { to: '/environment', label: 'ENVIRONMENT', icon: CloudSun },
-    { to: '/vessels', label: 'VESSELS', icon: Ship },
+    { to: '/sea-ice', label: 'SEA ICE', icon: Layers },
+    { to: '/environment', label: 'METOCEAN', icon: CloudSun },
+    { to: '/vessels', label: 'FLEET', icon: Ship },
+    { to: '/auth', label: 'VESSEL ACCESS', icon: Anchor },
     { to: '/scenario', label: 'WHAT IF?', icon: Shuffle },
     { to: '/history', label: 'HISTORY', icon: Clock },
     { to: '/models', label: 'MODELS', icon: Cpu },
@@ -114,11 +116,11 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
                 <Radio size={14} color="var(--accent-ice)" />
               </div>
               <div>
-                <div className="mono-readout" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-primary)' }}>
-                  POLAR OPS CENTER
+                <div className="mono-readout" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.12em', color: '#ffffff' }}>
+                  POLARNEXUS
                 </div>
-                <div className="technical-label" style={{ fontSize: '8.5px', color: 'var(--accent-ice)' }}>
-                  DECISION SUPPORT · 65°S
+                <div className="technical-label" style={{ fontSize: '8.5px', color: 'var(--accent-cyan)', letterSpacing: '0.14em' }}>
+                  POLAR OPERATIONS DECK
                 </div>
               </div>
             </div>

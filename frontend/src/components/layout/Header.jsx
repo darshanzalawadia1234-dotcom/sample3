@@ -202,25 +202,18 @@ export default function Header({ onMenuClick }) {
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => setShowAuthModal(true)}
+          <Link
+            to="/auth"
+            className="btn-tactical"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(91, 192, 190, 0.15)',
-              border: '1px solid var(--accent-cyan)',
-              borderRadius: 'var(--radius-xs)',
               padding: '4px 10px',
-              fontSize: '11px',
-              color: 'var(--text-primary)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-mono)'
+              textDecoration: 'none',
+              fontSize: '10.5px'
             }}
           >
-            <LogIn size={13} color="var(--accent-cyan)" />
-            <span>OPERATOR LOGIN</span>
-          </button>
+            <LogIn size={12} color="var(--accent-cyan)" />
+            <span>VESSEL ACCESS</span>
+          </Link>
         )}
 
         {/* Action Icons */}

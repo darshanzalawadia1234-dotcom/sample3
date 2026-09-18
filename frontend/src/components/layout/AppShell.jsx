@@ -3,13 +3,17 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import OperationsStrip from './OperationsStrip';
+import PolarShaderBackground from '../common/PolarShaderBackground';
 
 export default function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [shaderEnabled, setShaderEnabled] = useState(true);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'transparent' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'transparent', position: 'relative' }}>
+      {/* Ambient WebGL Simplex Noise Polar Abyss Shader */}
+      {shaderEnabled && <PolarShaderBackground opacity={0.75} />}
       {/* Persistent Left Sidebar */}
       <Sidebar
         collapsed={collapsed}

@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>POLARNEXUS — Vessel Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   POLARNEXUS — Antarctic Navigation Intelligence
+   Vessel authentication page
+   Tokens ------------------------------------------------- */
+:root{
+  --bg:#F5F7F8;
+  --dark-1:#07131D;
+  --dark-2:#10232F;
+  --ice:#B9DCE8;
+  --muted-blue:#6F98A8;
+  --text:#0B1821;
+  --text-2:#667780;
+  --border:#D7E0E4;
+  --border-strong:#C3D0D6;
+  --error:#9E3B34;
+  --error-bg:#FBF1F0;
+  --success:#2F6B52;
+  --field-h:52px;
+  --radius:10px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --display:"Space Grotesk","Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+/* The composition is intentionally fixed: dark terrain left, light instrument
+   panel right. Keep the same palette under a dark viewer theme. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#F5F7F8; --text:#0B1821; --border:#D7E0E4;
+  }
+}
+:root[data-theme="dark"]{ --bg:#F5F7F8; --text:#0B1821; --border:#D7E0E4; }
+
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--dark-1);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img{max-width:100%;}
+::selection{background:var(--ice);color:var(--dark-1);}
+
+/* Layout -------------------------------------------------- */
+.page{
+  display:grid;
+  grid-template-columns:50vw 50vw;
+  min-height:100vh;
+  min-height:100svh;
+}
+
+/* ---------- Left: terrain panel ---------- */
+.terrain{
+  position:relative;
+  overflow:hidden;
+  background:#050B12;
+  isolation:isolate;
+  --rx:50%; --ry:40%; --rv:0;
+}
+.terrain .contours{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+.contour{
+  fill:none;
+  stroke:#1B3245;
+  stroke-width:1.1;
+  vector-effect:non-scaling-stroke;
+  transition:stroke .5s var(--ease);
+}
+/* Cursor reveal: a soft radial mask brightens nearby contour lines a small,
+   fixed amount — no glow, no spotlight, just slightly easier to read. */
+.terrain-reveal{
+  position:absolute;inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:var(--rv);
+  transition:opacity .5s var(--ease);
+  background:radial-gradient(circle at var(--rx) var(--ry),
+    rgba(185,220,232,.10) 0%,
+    rgba(185,220,232,.045) 30%,
+    rgba(185,220,232,0) 62%);
+  mix-blend-mode:screen;
+}
+/* vignette + edge grade tying the panel to the divider */
+.terrain::after{
+  content:"";
+  position:absolute;inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 42% 45%, rgba(0,0,0,0) 38%, rgba(3,7,12,.72) 100%),
+    linear-gradient(90deg, rgba(5,11,18,.55) 0%, rgba(5,11,18,0) 22%, rgba(5,11,18,0) 78%, rgba(9,20,30,.65) 100%);
+  z-index:2;
+}
+.terrain-ui{
+  position:relative;
+  z-index:3;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:clamp(24px,3.4vw,48px);
+  pointer-events:none;
+}
+.brand{display:flex;align-items:flex-start;gap:14px;}
+.brand-mark{
+  width:30px;height:30px;flex:none;margin-top:2px;
+  opacity:.9;
+}
+.brand-name{
+  font-family:var(--display);
+  font-weight:500;
+  font-size:clamp(17px,1.5vw,21px);
+  letter-spacing:.15em;
+  white-space:nowrap;
+  color:#E6EFF3;
+  margin:0 0 6px;
+  line-height:1;
+}
+.brand-sub{
+  margin:0;
+  font-size:10.5px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#7E99A7;
+  font-weight:500;
+}
+.terrain-foot{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+}
+.readout{margin:0;}
+.readout dt{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:#5E7A88;font-weight:500;margin-bottom:10px;
+}
+.readout dd{
+  margin:0 0 5px;
+  font-size:12px;
+  letter-spacing:.05em;
+  color:#9FB6C1;
+  display:flex;align-items:center;gap:9px;
+}
+.readout dd::before{
+  content:"";width:4px;height:4px;flex:none;
+  background:var(--muted-blue);
+  transform:rotate(45deg);
+  opacity:.75;
+}
+.coords{
+  text-align:right;
+  font-family:var(--display);
+  font-size:11px;
+  letter-spacing:.14em;
+  color:#6E8A98;
+  line-height:1.9;
+}
+.coords span{display:block;}
+.coords .demo{
+  margin-top:10px;
+  font-family:var(--sans);
+  letter-spacing:.06em;
+  font-size:10px;
+  color:#4E6875;
+  text-transform:none;
+}
+
+/* ---------- The seam between the two halves ---------- */
+.terrain::before{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;right:0;
+  width:1px;
+  z-index:3;
+  background:linear-gradient(180deg,
+    rgba(185,220,232,0) 0%,
+    rgba(185,220,232,.28) 22%,
+    rgba(185,220,232,.42) 50%,
+    rgba(185,220,232,.28) 78%,
+    rgba(185,220,232,0) 100%);
+}
+
+/* ---------- Right: authentication panel ---------- */
+.auth{
+  position:relative;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(28px,4vw,64px) clamp(20px,4vw,56px);
+  overflow-y:auto;
+}
+/* coordinate ticks carried across from the map side */
+.auth::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;width:14px;
+  background-image:repeating-linear-gradient(180deg,
+    var(--border-strong) 0 1px, transparent 1px 34px);
+  opacity:.55;
+  pointer-events:none;
+}
+.auth-inner{
+  width:100%;
+  max-width:432px;
+}
+
+.eyebrow{
+  font-size:10.5px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--muted-blue);
+  font-weight:600;
+  margin:0 0 18px;
+  display:flex;align-items:center;gap:10px;
+}
+.eyebrow::after{
+  content:"";height:1px;flex:1;background:var(--border);
+}
+h1{
+  font-family:var(--display);
+  font-size:30px;
+  line-height:1.15;
+  font-weight:500;
+  letter-spacing:-.015em;
+  margin:0 0 10px;
+  color:var(--text);
+}
+.lede{
+  margin:0 0 26px;
+  color:var(--text-2);
+  font-size:14.5px;
+  max-width:37ch;
+}
+
+/* Mode toggle */
+.modes{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#EAEFF1;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:4px;
+  margin:0 0 26px;
+}
+.modes-thumb{
+  position:absolute;
+  top:4px;left:4px;
+  width:calc(50% - 4px);
+  height:calc(100% - 8px);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:7px;
+  box-shadow:0 1px 2px rgba(11,24,33,.05);
+  transition:transform .3s var(--ease);
+}
+.modes[data-mode="signup"] .modes-thumb{transform:translateX(100%);}
+.modes button{
+  position:relative;
+  z-index:1;
+  appearance:none;
+  background:none;
+  border:0;
+  font:inherit;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:.04em;
+  color:var(--text-2);
+  padding:9px 8px;
+  border-radius:7px;
+  cursor:pointer;
+  transition:color .25s var(--ease);
+}
+.modes button[aria-selected="true"]{color:var(--text);}
+
+/* Fields */
+.fields{display:grid;gap:16px;}
+.row{display:grid;gap:16px;}
+@media (min-width:520px){ .row.two{grid-template-columns:1fr 1fr;} }
+.field{display:grid;gap:7px;min-width:0;}
+label{
+  font-size:12.5px;
+  font-weight:500;
+  letter-spacing:.01em;
+  color:var(--text);
+}
+label .opt{color:var(--text-2);font-weight:400;}
+.control{position:relative;}
+input,select{
+  width:100%;
+  height:var(--field-h);
+  padding:0 14px;
+  font:inherit;
+  font-size:14.5px;
+  color:var(--text);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  transition:border-color .2s var(--ease), box-shadow .2s var(--ease), background-color .2s var(--ease);
+}
+input::placeholder{color:#9BA9B0;}
+select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23667780' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:38px;
+  cursor:pointer;
+}
+select:invalid,select.placeholder{color:#9BA9B0;}
+input:hover,select:hover{border-color:var(--border-strong);}
+input:focus,select:focus{outline:none;}
+input:focus-visible,select:focus-visible{
+  border-color:var(--muted-blue);
+  box-shadow:0 0 0 3px rgba(185,220,232,.55);
+}
+input[aria-invalid="true"],select[aria-invalid="true"]{border-color:var(--error);background:var(--error-bg);}
+input[aria-invalid="true"]:focus-visible,select[aria-invalid="true"]:focus-visible{box-shadow:0 0 0 3px rgba(158,59,52,.16);}
+.has-toggle input{padding-right:48px;}
+.peek{
+  position:absolute;
+  right:6px;top:50%;
+  transform:translateY(-50%);
+  width:38px;height:38px;
+  display:grid;place-items:center;
+  border:0;background:none;
+  border-radius:7px;
+  color:var(--text-2);
+  cursor:pointer;
+  transition:color .2s var(--ease), background-color .2s var(--ease);
+}
+.peek:hover{color:var(--text);background:#EEF2F4;}
+.peek:focus-visible{outline:2px solid var(--muted-blue);outline-offset:1px;}
+.msg{
+  font-size:12.5px;
+  color:var(--error);
+  display:none;
+  align-items:flex-start;
+  gap:6px;
+}
+.msg.show{display:flex;}
+.msg::before{
+  content:"";
+  width:3px;align-self:stretch;flex:none;
+  background:var(--error);
+  border-radius:2px;
+  opacity:.6;
+}
+
+/* Row of options */
+.inline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+.check{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;color:var(--text-2);}
+.check input{
+  width:17px;height:17px;
+  appearance:none;
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+  background:#fff;
+  cursor:pointer;
+  display:grid;place-content:center;
+  padding:0;
+  flex:none;
+}
+.check input::after{
+  content:"";
+  width:9px;height:9px;
+  transform:scale(0);
+  transition:transform .15s var(--ease);
+  background:var(--dark-1);
+  clip-path:polygon(14% 46%,0 60%,38% 100%,100% 22%,86% 8%,38% 70%);
+}
+.check input:checked{border-color:var(--dark-1);}
+.check input:checked::after{transform:scale(1);}
+.check input:focus-visible{outline:2px solid var(--muted-blue);outline-offset:2px;}
+.link{
+  font-size:13.5px;
+  color:var(--dark-2);
+  text-decoration:none;
+  border-bottom:1px solid var(--border-strong);
+  padding-bottom:1px;
+  transition:border-color .2s var(--ease), color .2s var(--ease);
+  background:none;border-left:0;border-right:0;border-top:0;
+  font-family:inherit;cursor:pointer;
+}
+.link:hover{color:var(--dark-1);border-color:var(--muted-blue);}
+.link:focus-visible{outline:2px solid var(--muted-blue);outline-offset:3px;border-radius:2px;}
+
+/* Submit */
+.submit{
+  margin-top:24px;
+  width:100%;
+  height:54px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  background:var(--dark-1);
+  color:#EAF2F5;
+  font:inherit;
+  font-size:14.5px;
+  font-weight:500;
+  letter-spacing:.02em;
+  border:1px solid var(--dark-1);
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:background-color .22s var(--ease), transform .18s var(--ease), box-shadow .22s var(--ease);
+}
+.submit:hover:not(:disabled){
+  background:var(--dark-2);
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(7,19,29,.16);
+}
+.submit:active:not(:disabled){transform:translateY(0);box-shadow:none;}
+.submit:focus-visible{outline:2px solid var(--muted-blue);outline-offset:3px;}
+.submit:disabled{cursor:progress;opacity:.86;}
+.spinner{
+  width:15px;height:15px;flex:none;
+  border:1.8px solid rgba(234,242,245,.28);
+  border-top-color:#EAF2F5;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Panel-level alert */
+.alert{
+  display:none;
+  gap:11px;
+  align-items:flex-start;
+  padding:13px 15px;
+  border:1px solid #E7CFCC;
+  background:var(--error-bg);
+  border-left:3px solid var(--error);
+  border-radius:8px;
+  color:#7C2F29;
+  font-size:13.5px;
+  margin:0 0 20px;
+}
+.alert.show{display:flex;}
+.alert svg{flex:none;margin-top:2px;}
+
+/* Footer */
+.foot{
+  margin-top:26px;
+  padding-top:20px;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  font-size:13.5px;
+  color:var(--text-2);
+}
+.note{
+  margin:14px 0 0;
+  font-size:11.5px;
+  color:#8A979D;
+  line-height:1.55;
+}
+
+/* Form swap */
+form{margin:0;}
+form[hidden]{display:none;}
+.swap{animation:swapIn .34s var(--ease) both;}
+@keyframes swapIn{
+  from{opacity:0;transform:translateY(6px);}
+  to{opacity:1;transform:none;}
+}
+
+/* Success */
+.done{
+  text-align:left;
+  animation:swapIn .4s var(--ease) both;
+}
+.done .tick{
+  width:46px;height:46px;
+  border-radius:50%;
+  border:1px solid rgba(47,107,82,.35);
+  display:grid;place-items:center;
+  color:var(--success);
+  margin-bottom:22px;
+}
+.done h2{
+  font-family:var(--display);
+  font-size:24px;font-weight:500;
+  margin:0 0 8px;letter-spacing:-.01em;
+}
+.done p{margin:0;color:var(--text-2);}
+.bar{
+  margin-top:26px;
+  height:2px;
+  background:var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+.bar i{
+  display:block;height:100%;width:0;
+  background:var(--dark-2);
+  animation:fill 2.2s var(--ease) forwards;
+}
+@keyframes fill{to{width:100%;}}
+
+/* Entrance */
+.auth-inner{animation:panelIn .6s .1s var(--ease) both;}
+.terrain-ui{animation:uiIn .9s .25s var(--ease) both;}
+@keyframes panelIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes uiIn{from{opacity:0;}to{opacity:1;}}
+
+/* Responsive ---------------------------------------------- */
+@media (max-width:1100px) and (min-width:861px){
+  .page{grid-template-columns:45vw 55vw;}
+}
+@media (max-width:860px){
+  .page{
+    grid-template-columns:1fr;
+    min-height:100svh;
+  }
+  .terrain{height:38vh;min-height:250px;}
+  .terrain::before{
+    top:auto;left:0;right:0;bottom:0;width:auto;height:1px;
+    background:linear-gradient(90deg,rgba(185,220,232,0),rgba(185,220,232,.4),rgba(185,220,232,0));
+  }
+  .terrain-ui{padding:22px;}
+  .terrain-foot .readout{display:none;}
+  .auth{padding:34px 22px 48px;align-items:flex-start;}
+  .auth::before{display:none;}
+  .auth-inner{max-width:460px;margin:0 auto;}
+  h1{font-size:26px;}
+}
+@media (max-width:420px){
+  .brand-name{font-size:19px;}
+  :root{--field-h:50px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  .spinner{animation:spin 1.1s linear infinite !important;}
+}
+</style>
+</head>
+<body>
+
+<main class="page">
+
+  <!-- ===================== TerrainPanel ===================== -->
+  <section class="terrain" id="terrain" aria-hidden="true">
+    <!-- Static procedural contour model. No 3D, no canvas, no external assets. -->
+    <svg class="contours" viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice" role="presentation">
+      <defs>
+        <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#050B12"/>
+          <stop offset="55%" stop-color="#0A1723"/>
+          <stop offset="100%" stop-color="#050B12"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="1000" fill="url(#fg)"/>
+      <g id="fallbackLines"></g>
+    </svg>
+    <div class="terrain-reveal"></div>
+
+    <div class="terrain-ui">
+      <!-- TerrainBrand -->
+      <header class="brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="#B9DCE8" stroke-width="1.1" aria-hidden="true">
+          <circle cx="16" cy="16" r="13.2" opacity=".5"/>
+          <path d="M16 2.8v26.4M2.8 16h26.4" opacity=".28"/>
+          <path d="M16 6.5 19.4 16 16 25.5 12.6 16Z"/>
+          <path d="M6.5 16 16 12.9 25.5 16 16 19.1Z" opacity=".6"/>
+        </svg>
+        <div>
+          <p class="brand-name">POLARNEXUS</p>
+          <p class="brand-sub">Antarctic Navigation Intelligence</p>
+        </div>
+      </header>
+
+      <!-- TerrainInfo -->
+      <div class="terrain-foot">
+        <dl class="readout">
+          <dt>Platform modules</dt>
+          <dd>Sea-ice concentration forecast</dd>
+          <dd>Iceberg trajectory model</dd>
+          <dd>Route &amp; fuel optimisation</dd>
+        </dl>
+        <div class="coords">
+          <span>LAT 72°14′ S</span>
+          <span>LON 105°38′ E</span>
+          <span>ELEVATION MODEL · v4</span>
+          <span class="demo">Illustrative terrain model. Not live data.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AuthPanel ===================== -->
+  <section class="auth">
+    <div class="auth-inner" id="authRoot">
+
+      <!-- AuthHeader -->
+      <p class="eyebrow">Vessel access</p>
+      <h1 id="authTitle">Welcome back</h1>
+      <p class="lede" id="authLede">Sign in to access your vessel's Antarctic navigation workspace.</p>
+
+      <!-- AuthModeToggle -->
+      <div class="modes" id="modes" data-mode="signin" role="tablist" aria-label="Authentication mode">
+        <span class="modes-thumb" aria-hidden="true"></span>
+        <button type="button" role="tab" id="tabSignin" aria-controls="formSignin" aria-selected="true">Sign in</button>
+        <button type="button" role="tab" id="tabSignup" aria-controls="formSignup" aria-selected="false">Register</button>
+      </div>
+
+      <!-- Panel-level authentication failure -->
+      <div class="alert" id="authAlert" role="alert" aria-live="assertive">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.4"/><path d="M8 4.7v4M8 11.1h.01" stroke-linecap="round"/>
+        </svg>
+        <span id="authAlertText"></span>
+      </div>
+
+      <!-- SignInForm -->
+      <form id="formSignin" role="tabpanel" aria-labelledby="tabSignin" novalidate>
+        <div class="fields">
+          <div class="field">
+            <label for="si-vesselId">Vessel ID</label>
+            <div class="control">
+              <input id="si-vesselId" name="vesselId" type="text" placeholder="Enter vessel ID"
+                     autocomplete="username" spellcheck="false" aria-describedby="err-si-vesselId" />
+            </div>
+            <p class="msg" id="err-si-vesselId"></p>
+          </div>
+
+          <div class="field">
+            <label for="si-password">Password</label>
+            <div class="control has-toggle">
+              <input id="si-password" name="password" type="password" placeholder="Enter vessel password"
+                     autocomplete="current-password" aria-describedby="err-si-password" />
+              <button type="button" class="peek" data-peek="si-password" aria-label="Show password" aria-pressed="false"></button>
+            </div>
+            <p class="msg" id="err-si-password"></p>
+          </div>
+
+          <div class="inline">
+            <label class="check" for="si-remember">
+              <input type="checkbox" id="si-remember" name="remember" />
+              Remember this vessel
+            </label>
+            <button type="button" class="link" id="forgotLink">Forgot vessel password?</button>
+          </div>
+        </div>
+
+        <button type="submit" class="submit" id="signinSubmit">Access vessel workspace</button>
+      </form>
+
+      <!-- SignUpForm -->
+      <form id="formSignup" role="tabpanel" aria-labelledby="tabSignup" novalidate hidden>
+        <div class="fields">
+          <div class="row two">
+            <div class="field">
+              <label for="su-vesselName">Vessel name</label>
+              <div class="control">
+                <input id="su-vesselName" name="vesselName" type="text" placeholder="e.g. Aurora Explorer"
+                       autocomplete="off" aria-describedby="err-su-vesselName" />
+              </div>
+              <p class="msg" id="err-su-vesselName"></p>
+            </div>
+            <div class="field">
+              <label for="su-vesselId">Vessel ID</label>
+              <div class="control">
+                <input id="su-vesselId" name="vesselId" type="text" placeholder="e.g. VSL-2048"
+                       autocomplete="off" spellcheck="false" aria-describedby="err-su-vesselId" />
+              </div>
+              <p class="msg" id="err-su-vesselId"></p>
+            </div>
+          </div>
+
+          <div class="row two">
+            <div class="field">
+              <label for="su-vesselType">Vessel type</label>
+              <div class="control">
+                <select id="su-vesselType" name="vesselType" class="placeholder" aria-describedby="err-su-vesselType">
+                  <option value="" selected>Select type</option>
+                  <option>Research vessel</option>
+                  <option>Icebreaker</option>
+                  <option>Survey vessel</option>
+                  <option>Support vessel</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <p class="msg" id="err-su-vesselType"></p>
+            </div>
+            <div class="field">
+              <label for="su-homePort">Home port</label>
+              <div class="control">
+                <input id="su-homePort" name="homePort" type="text" placeholder="Enter home port"
+                       autocomplete="off" aria-describedby="err-su-homePort" />
+              </div>
+              <p class="msg" id="err-su-homePort"></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="su-organization">Operating organisation</label>
+            <div class="control">
+              <input id="su-organization" name="organization" type="text" placeholder="Research organization / operator"
+                     autocomplete="organization" aria-describedby="err-su-organization" />
+            </div>
+            <p class="msg" id="err-su-organization"></p>
+          </div>
+
+          <div class="row two">
+            <div class="field">
+              <label for="su-operatingRegion">Primary operating region</label>
+              <div class="control">
+                <input id="su-operatingRegion" name="operatingRegion" type="text" list="regions"
+                       placeholder="e.g. Antarctic Peninsula" autocomplete="off" aria-describedby="err-su-operatingRegion" />
+                <datalist id="regions">
+                  <option value="Antarctic Peninsula"></option>
+                  <option value="Weddell Sea"></option>
+                  <option value="Ross Sea"></option>
+                  <option value="Amundsen Sea"></option>
+                  <option value="Davis Sea"></option>
+                  <option value="Prydz Bay"></option>
+                  <option value="Southern Ocean — circumpolar"></option>
+                </datalist>
+              </div>
+              <p class="msg" id="err-su-operatingRegion"></p>
+            </div>
+            <div class="field">
+              <label for="su-missionId">Voyage / mission ID <span class="opt">(optional)</span></label>
+              <div class="control">
+                <input id="su-missionId" name="missionId" type="text" placeholder="Optional" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="su-password">Password</label>
+            <div class="control has-toggle">
+              <input id="su-password" name="password" type="password" placeholder="Create vessel password"
+                     autocomplete="new-password" aria-describedby="err-su-password" />
+              <button type="button" class="peek" data-peek="su-password" aria-label="Show password" aria-pressed="false"></button>
+            </div>
+            <p class="msg" id="err-su-password"></p>
+          </div>
+
+          <div class="field">
+            <label for="su-confirmPassword">Confirm password</label>
+            <div class="control has-toggle">
+              <input id="su-confirmPassword" name="confirmPassword" type="password" placeholder="Confirm vessel password"
+                     autocomplete="new-password" aria-describedby="err-su-confirmPassword" />
+              <button type="button" class="peek" data-peek="su-confirmPassword" aria-label="Show password" aria-pressed="false"></button>
+            </div>
+            <p class="msg" id="err-su-confirmPassword"></p>
+          </div>
+        </div>
+
+        <button type="submit" class="submit" id="signupSubmit">Register vessel</button>
+      </form>
+
+      <!-- AuthFooter -->
+      <div class="foot" id="authFoot">
+        <span id="footPrompt">New vessel?</span>
+        <button type="button" class="link" id="footSwitch">Register your vessel</button>
+      </div>
+      <p class="note">Front-end demo. Credentials are validated in the browser only and nothing is sent to a server.</p>
+
+    </div>
+  </section>
+</main>
+
+<script>
+/* ==========================================================================
+   POLARNEXUS — vessel authentication
+   Modules:
+     Noise          procedural elevation source
+     TerrainPanel   static SVG contour panel + CSS cursor reveal
+     AuthService    placeholder backend calls (swap for Supabase later)
+     Validation     field rules, no backend knowledge
+     AuthPanel      form state, errors, loading, success
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------------------------------------------------------- Noise */
+  var Noise = (function () {
+    var p = new Uint8Array(512), perm = [];
+    var seed = 20241;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var i = 0; i < 256; i++) perm[i] = i;
+    for (var j = 255; j > 0; j--) { var k = Math.floor(rnd() * (j + 1)); var t = perm[j]; perm[j] = perm[k]; perm[k] = t; }
+    for (var m = 0; m < 512; m++) p[m] = perm[m & 255];
+
+    function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+    function lerp(a, b, t) { return a + t * (b - a); }
+    function grad(h, x, y) {
+      switch (h & 3) {
+        case 0: return x + y; case 1: return -x + y; case 2: return x - y; default: return -x - y;
+      }
+    }
+    function perlin(x, y) {
+      var X = Math.floor(x) & 255, Y = Math.floor(y) & 255;
+      var xf = x - Math.floor(x), yf = y - Math.floor(y);
+      var u = fade(xf), v = fade(yf);
+      var aa = p[p[X] + Y], ab = p[p[X] + Y + 1], ba = p[p[X + 1] + Y], bb = p[p[X + 1] + Y + 1];
+      var x1 = lerp(grad(aa, xf, yf), grad(ba, xf - 1, yf), u);
+      var x2 = lerp(grad(ab, xf, yf - 1), grad(bb, xf - 1, yf - 1), u);
+      return lerp(x1, x2, v) * 0.72;
+    }
+
+    /* Ridged multifractal over a broad smooth base: sharp ice ridges rising
+       out of flatter shelf areas, rather than a fantasy mountain range. */
+    function elevation(x, y) {
+      var e = 0, amp = 1, freq = 0.52, norm = 0, i;
+      for (i = 0; i < 5; i++) {
+        var n = perlin(x * freq, y * freq);
+        e += amp * (1 - Math.abs(n));
+        norm += amp; amp *= 0.5; freq *= 2.07;
+      }
+      e /= norm;
+      var base = 0.5 + 0.5 * perlin(x * 0.29 + 120, y * 0.29 - 46);
+      var h = e * 0.76 + base * 0.34;
+      h = Math.pow(Math.max(h - 0.22, 0) / 0.78, 1.85);   /* flatten the shelf */
+      return h * 2.45;
+    }
+    return { elevation: elevation, perlin: perlin };
+  })();
+
+  /* -------------------------------------------------------- TerrainPanel
+     Static topographic panel — layered SVG contour bands generated from the
+     same noise field, with the cursor-reveal done in CSS via a radial mask
+     instead of a 3D light. No WebGL, no animation loop. */
+  var TerrainPanel = (function () {
+    var host = document.getElementById("terrain");
+    var g = document.getElementById("fallbackLines");
+
+    function build() {
+      var rows = 34, cols = 22, w = 800, h = 1000;
+      var parts = [];
+      for (var r = 0; r < rows; r++) {
+        var y0 = (r / (rows - 1)) * h;
+        var d = "M -20 " + y0.toFixed(1);
+        for (var c = 0; c <= cols; c++) {
+          var x = (c / cols) * (w + 40) - 20;
+          var n = Noise.elevation(x * 0.012, r * 0.5);
+          var y = y0 - n * 46 + Math.sin(r * 0.6) * 6;
+          d += " L " + x.toFixed(1) + " " + y.toFixed(1);
+        }
+        var depth = r / rows;
+        parts.push(
+          '<path class="contour" d="' + d + '" ' +
+          'style="opacity:' + (0.1 + depth * 0.32).toFixed(2) + '" ' +
+          'data-row="' + r + '"/>'
+        );
+      }
+      g.innerHTML = parts.join("");
+    }
+
+    /* Cursor reveal: a small radial-gradient mask, positioned with CSS custom
+       properties, brightens the contour lines and surface near the pointer.
+       This mirrors the brief's "small localized light" without a 3D scene. */
+    function wireReveal() {
+      if (reduceMotion) return;
+      var raf = 0, px = 50, py = 40, on = false;
+
+      function apply() {
+        host.style.setProperty("--rx", px + "%");
+        host.style.setProperty("--ry", py + "%");
+        host.style.setProperty("--rv", on ? "1" : "0");
+        raf = 0;
+      }
+      function onMove(ev) {
+        var r = host.getBoundingClientRect();
+        px = ((ev.clientX - r.left) / r.width) * 100;
+        py = ((ev.clientY - r.top) / r.height) * 100;
+        on = true;
+        if (!raf) raf = requestAnimationFrame(apply);
+      }
+      function onLeave() {
+        on = false;
+        if (!raf) raf = requestAnimationFrame(apply);
+      }
+      host.addEventListener("pointermove", onMove, { passive: true });
+      host.addEventListener("pointerleave", onLeave, { passive: true });
+      host.addEventListener("pointercancel", onLeave, { passive: true });
+    }
+
+    function init() {
+      build();
+      wireReveal();
+    }
+
+    return { init: init };
+  })();
+
+  /* ---------------------------------------------------------- AuthService
+     Placeholder transport. Replace the bodies with Supabase calls; the UI
+     layer only depends on the returned shape. Nothing is persisted here and
+     passwords never touch localStorage. */
+  var AuthService = (function () {
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    async function signInVessel(credentials) {
+      await wait(1100);
+      /* demo rule only — a real backend decides this */
+      if (String(credentials.password).length < 6) {
+        return { ok: false, error: "Unable to authenticate this vessel. Check the Vessel ID and password and try again." };
+      }
+      return { ok: true, vessel: { vesselId: credentials.vesselId } };
+    }
+
+    async function registerVessel(profile) {
+      await wait(1300);
+      return { ok: true, vessel: { vesselId: profile.vesselId, vesselName: profile.vesselName } };
+    }
+
+    return { signInVessel: signInVessel, registerVessel: registerVessel };
+  })();
+
+  /* ------------------------------------------------------------ Validation */
+  var Validation = (function () {
+    var REQUIRED = {
+      vesselName: "Vessel name is required.",
+      vesselId: "Vessel ID is required.",
+      vesselType: "Select a vessel type.",
+      organization: "Operating organisation is required.",
+      homePort: "Home port is required.",
+      operatingRegion: "Primary operating region is required.",
+      password: "Password is required.",
+      confirmPassword: "Confirm the password."
+    };
+
+    function signIn(data) {
+      var e = {};
+      if (!data.vesselId.trim()) e.vesselId = REQUIRED.vesselId;
+      if (!data.password) e.password = REQUIRED.password;
+      return e;
+    }
+
+    function signUp(data) {
+      var e = {}, keys = ["vesselName", "vesselId", "vesselType", "organization", "homePort", "operatingRegion", "password", "confirmPassword"];
+      keys.forEach(function (k) {
+        if (!String(data[k] || "").trim()) e[k] = REQUIRED[k];
+      });
+      if (!e.password && data.password.length < 8) e.password = "Use at least 8 characters.";
+      if (!e.confirmPassword && !e.password && data.password !== data.confirmPassword) {
+        e.confirmPassword = "Passwords do not match.";
+      }
+      return e;
+    }
+
+    return { signIn: signIn, signUp: signUp };
+  })();
+
+  /* ------------------------------------------------------------- AuthPanel */
+  var AuthPanel = (function () {
+    var root = document.getElementById("authRoot");
+    var modes = document.getElementById("modes");
+    var tabIn = document.getElementById("tabSignin");
+    var tabUp = document.getElementById("tabSignup");
+    var formIn = document.getElementById("formSignin");
+    var formUp = document.getElementById("formSignup");
+    var title = document.getElementById("authTitle");
+    var lede = document.getElementById("authLede");
+    var alertBox = document.getElementById("authAlert");
+    var alertText = document.getElementById("authAlertText");
+    var foot = document.getElementById("authFoot");
+    var footPrompt = document.getElementById("footPrompt");
+    var footSwitch = document.getElementById("footSwitch");
+    var busy = false;
+    var mode = "signin";
+
+    var COPY = {
+      signin: {
+        title: "Welcome back",
+        lede: "Sign in to access your vessel's Antarctic navigation workspace.",
+        prompt: "New vessel?",
+        link: "Register your vessel"
+      },
+      signup: {
+        title: "Register your vessel",
+        lede: "Create a vessel profile to begin using Antarctic navigation intelligence.",
+        prompt: "Vessel already registered?",
+        link: "Sign in instead"
+      }
+    };
+
+    var EYE = '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1.8 10S5 4.6 10 4.6 18.2 10 18.2 10 15 15.4 10 15.4 1.8 10 1.8 10Z"/><circle cx="10" cy="10" r="2.5"/></svg>';
+    var EYE_OFF = '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M7.9 5c.68-.18 1.38-.27 2.1-.27 5 0 8.2 5.27 8.2 5.27a15 15 0 0 1-2.66 3.2M4.6 6.4A15 15 0 0 0 1.8 10S5 15.27 10 15.27c1.2 0 2.3-.3 3.28-.77" stroke-linecap="round"/><path d="M8.3 8.4a2.4 2.4 0 0 0 3.36 3.4M2.6 2.6l14.8 14.8" stroke-linecap="round"/></svg>';
+
+    /* --- field helpers --- */
+    function fieldEl(prefix, name) { return document.getElementById(prefix + "-" + name); }
+    function setError(prefix, name, message) {
+      var input = fieldEl(prefix, name);
+      var msg = document.getElementById("err-" + prefix + "-" + name);
+      if (!input || !msg) return;
+      if (message) {
+        input.setAttribute("aria-invalid", "true");
+        msg.textContent = message;
+        msg.classList.add("show");
+      } else {
+        input.removeAttribute("aria-invalid");
+        msg.textContent = "";
+        msg.classList.remove("show");
+      }
+    }
+    function clearErrors(prefix, names) {
+      names.forEach(function (n) { setError(prefix, n, ""); });
+      hideAlert();
+    }
+    function applyErrors(prefix, errors, names) {
+      names.forEach(function (n) { setError(prefix, n, errors[n] || ""); });
+      var first = names.filter(function (n) { return errors[n]; })[0];
+      if (first) fieldEl(prefix, first).focus();
+    }
+    function showAlert(text) { alertText.textContent = text; alertBox.classList.add("show"); }
+    function hideAlert() { alertBox.classList.remove("show"); }
+
+    var SIGNIN_FIELDS = ["vesselId", "password"];
+    var SIGNUP_FIELDS = ["vesselName", "vesselId", "vesselType", "organization", "homePort", "operatingRegion", "password", "confirmPassword"];
+
+    function readSignIn() {
+      return { vesselId: fieldEl("si", "vesselId").value, password: fieldEl("si", "password").value };
+    }
+    function readSignUp() {
+      var d = {};
+      SIGNUP_FIELDS.concat(["missionId"]).forEach(function (k) {
+        var el = fieldEl("su", k);
+        d[k] = el ? el.value : "";
+      });
+      return d;
+    }
+
+    /* --- mode --- */
+    function setMode(next, focus) {
+      if (busy || next === mode) return;
+      mode = next;
+      modes.setAttribute("data-mode", next);
+      tabIn.setAttribute("aria-selected", String(next === "signin"));
+      tabUp.setAttribute("aria-selected", String(next === "signup"));
+      hideAlert();
+
+      var showing = next === "signin" ? formIn : formUp;
+      var hiding = next === "signin" ? formUp : formIn;
+      hiding.hidden = true;
+      showing.hidden = false;
+      showing.classList.remove("swap");
+      void showing.offsetWidth;
+      showing.classList.add("swap");
+
+      var c = COPY[next];
+      title.textContent = c.title;
+      lede.textContent = c.lede;
+      footPrompt.textContent = c.prompt;
+      footSwitch.textContent = c.link;
+      if (focus) showing.querySelector("input, select").focus();
+    }
+
+    /* --- submission --- */
+    function setBusy(button, label, state) {
+      busy = state;
+      button.disabled = state;
+      button.innerHTML = state ? '<span class="spinner" aria-hidden="true"></span>' + label : label;
+      [tabIn, tabUp, footSwitch].forEach(function (el) { el.disabled = state; });
+    }
+
+    function success(headline, detail) {
+      root.innerHTML =
+        '<div class="done">' +
+        '<div class="tick" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 10.4 8.3 14l7.1-8"/></svg></div>' +
+        '<h2>' + headline + '</h2>' +
+        '<p>' + detail + '</p>' +
+        '<div class="bar"><i></i></div>' +
+        '<p class="note">Demo build — the navigation workspace is not wired up yet. Returning to vessel access.</p>' +
+        '</div>';
+      root.setAttribute("role", "status");
+      root.setAttribute("aria-live", "polite");
+      setTimeout(function () { window.location.reload(); }, 3600);
+    }
+
+    function wire() {
+      tabIn.addEventListener("click", function () { setMode("signin", true); });
+      tabUp.addEventListener("click", function () { setMode("signup", true); });
+      footSwitch.addEventListener("click", function () {
+        setMode(mode === "signin" ? "signup" : "signin", true);
+      });
+      modes.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        e.preventDefault();
+        var next = mode === "signin" ? "signup" : "signin";
+        setMode(next, false);
+        (next === "signin" ? tabIn : tabUp).focus();
+      });
+
+      document.getElementById("forgotLink").addEventListener("click", function () {
+        showAlert("Password resets are issued by your operating organisation's POLARNEXUS administrator.");
+      });
+
+      /* password visibility */
+      document.querySelectorAll(".peek").forEach(function (btn) {
+        btn.innerHTML = EYE;
+        btn.addEventListener("click", function () {
+          var input = document.getElementById(btn.getAttribute("data-peek"));
+          var shown = input.type === "text";
+          input.type = shown ? "password" : "text";
+          btn.innerHTML = shown ? EYE : EYE_OFF;
+          btn.setAttribute("aria-label", shown ? "Show password" : "Hide password");
+          btn.setAttribute("aria-pressed", String(!shown));
+          input.focus();
+        });
+      });
+
+      /* select placeholder colour */
+      var typeSel = fieldEl("su", "vesselType");
+      typeSel.addEventListener("change", function () {
+        typeSel.classList.toggle("placeholder", !typeSel.value);
+      });
+
+      /* clear a field's error as soon as it is edited */
+      [["si", SIGNIN_FIELDS], ["su", SIGNUP_FIELDS]].forEach(function (pair) {
+        pair[1].forEach(function (name) {
+          var el = fieldEl(pair[0], name);
+          if (!el) return;
+          el.addEventListener("input", function () { setError(pair[0], name, ""); });
+          el.addEventListener("change", function () { setError(pair[0], name, ""); });
+        });
+      });
+
+      formIn.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        if (busy) return;
+        var data = readSignIn();
+        clearErrors("si", SIGNIN_FIELDS);
+        var errors = Validation.signIn(data);
+        if (Object.keys(errors).length) { applyErrors("si", errors, SIGNIN_FIELDS); return; }
+
+        var btn = document.getElementById("signinSubmit");
+        setBusy(btn, "Authenticating vessel…", true);
+        var res = await AuthService.signInVessel(data);
+        if (res.ok) {
+          success("Vessel authenticated", "Preparing navigation workspace…");
+        } else {
+          setBusy(btn, "Access vessel workspace", false);
+          showAlert(res.error);
+          fieldEl("si", "password").focus();
+        }
+      });
+
+      formUp.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        if (busy) return;
+        var data = readSignUp();
+        clearErrors("su", SIGNUP_FIELDS);
+        var errors = Validation.signUp(data);
+        if (Object.keys(errors).length) { applyErrors("su", errors, SIGNUP_FIELDS); return; }
+
+        var btn = document.getElementById("signupSubmit");
+        setBusy(btn, "Registering vessel…", true);
+        var res = await AuthService.registerVessel(data);
+        if (res.ok) {
+          success("Vessel registered", "Preparing navigation workspace…");
+        } else {
+          setBusy(btn, "Register vessel", false);
+          showAlert("Unable to register this vessel. Check the details and try again.");
+        }
+      });
+    }
+
+    return { init: wire };
+  })();
+
+  TerrainPanel.init();
+  AuthPanel.init();
+})();
+</script>
+</body>
+</html>
