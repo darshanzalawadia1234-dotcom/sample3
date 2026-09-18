@@ -66,7 +66,8 @@ export default function Dashboard() {
           style={{
             position: 'relative',
             height: '100%',
-            minHeight: '480px',
+            minHeight: '380px',
+            maxHeight: 'calc(100vh - 160px)',
             backgroundColor: 'var(--map-bg)',
             overflow: 'hidden'
           }}

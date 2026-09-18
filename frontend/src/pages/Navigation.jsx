@@ -48,9 +48,9 @@ export default function Navigation() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '320px 1fr',
-          gap: '18px',
-          minHeight: '440px'
+          gridTemplateColumns: '300px 1fr',
+          gap: '16px',
+          alignItems: 'stretch'
         }}
         className="nav-split-grid"
       >
@@ -60,10 +60,10 @@ export default function Navigation() {
             backgroundColor: '#121512',
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
-            padding: '20px',
+            padding: '18px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '18px'
+            gap: '14px'
           }}
         >
           <div className="technical-label">OPTIMIZATION PARAMETERS</div>
@@ -132,12 +132,12 @@ export default function Navigation() {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '6px' }}>
             <button
               onClick={handleOptimize}
               disabled={optimizing}
               className="btn-primary-action"
-              style={{ flex: 1, padding: '9px 12px' }}
+              style={{ flex: 1, padding: '8px 12px' }}
             >
               <Play size={13} fill="#0B0D0C" />
               <span>{optimizing ? 'Calculating...' : 'Optimize route'}</span>
@@ -146,7 +146,7 @@ export default function Navigation() {
             <button
               onClick={handleReset}
               className="btn-secondary"
-              style={{ padding: '9px 12px' }}
+              style={{ padding: '8px 12px' }}
               title="Reset sliders"
             >
               <RotateCcw size={14} />
@@ -155,14 +155,14 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* RIGHT: Large Map */}
+        {/* RIGHT: Map Container */}
         <div
           style={{
             backgroundColor: '#0B0F0D',
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            minHeight: '440px'
+            height: '350px'
           }}
         >
           <MapContainer

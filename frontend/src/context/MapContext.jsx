@@ -17,8 +17,8 @@ const DEFAULT_LAYERS = {
 };
 
 export function MapProvider({ children }) {
-  const [center, setCenter] = useState([-65.5, -60.0]); // Antarctic Peninsula / Weddell Margin
-  const [zoom, setZoom] = useState(4);
+  const [center, setCenter] = useState([-68.0, -45.0]); // Southern Ocean / Weddell Gateway
+  const [zoom, setZoom] = useState(3);
   const [activeLayers, setActiveLayers] = useState(DEFAULT_LAYERS);
   const [selectedIcebergId, setSelectedIcebergId] = useState(null);
   const [selectedSegmentId, setSelectedSegmentId] = useState(null);

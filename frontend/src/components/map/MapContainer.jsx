@@ -41,19 +41,24 @@ export default function MapContainer({
 
     // Create map centered on Antarctic Peninsula / Weddell Gateway
     const map = L.map(mapRef.current, {
-      center: center || [-65.5, -60.0],
-      zoom: zoom || 4,
-      minZoom: 3,
-      maxZoom: 10,
+      center: center || [-68.0, -45.0],
+      zoom: zoom || 3,
+      minZoom: 2,
+      maxZoom: 9,
       zoomControl: false,
-      attributionControl: true
+      attributionControl: true,
+      preferCanvas: true // Use HTML5 Canvas for vector rendering (significantly faster!)
     });
+
+    // Minimal square zoom control in top-right
+    L.control.zoom({ position: 'topright' }).addTo(map);
 
     // Dark cartographic ocean basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> | GEBCO Bathymetry & Polar GIS',
+      attribution: '&copy; CARTO | GEBCO Bathymetry',
       subdomains: 'abcd',
-      maxZoom: 12
+      maxZoom: 9,
+      keepBuffer: 2
     }).addTo(map);
 
     // Layer groups for dynamic toggling
