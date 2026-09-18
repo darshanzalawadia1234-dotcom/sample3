@@ -89,7 +89,9 @@ export default function Dashboard() {
         {/* RIGHT: Operations Intelligence Panels */}
         <div
           style={{
-            backgroundColor: '#0D100E',
+            backgroundColor: 'rgba(13, 16, 14, 0.65)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
             padding: '16px',
             display: 'flex',
             flexDirection: 'column',
@@ -101,10 +103,13 @@ export default function Dashboard() {
           {/* Section 10: HAZARD PANEL */}
           <div
             style={{
-              backgroundColor: '#121512',
+              backgroundColor: 'rgba(18, 21, 18, 0.75)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               border: '1px solid #292D28',
               borderRadius: 'var(--radius-sm)',
-              padding: '12px'
+              padding: '12px',
+              transition: 'border-color 0.2s ease'
             }}
           >
             <div className="flex-between" style={{ marginBottom: '6px' }}>
@@ -141,10 +146,13 @@ export default function Dashboard() {
           {/* Section 11: RECOMMENDED ACTION */}
           <div
             style={{
-              backgroundColor: '#121512',
+              backgroundColor: 'rgba(18, 21, 18, 0.75)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               border: '1px solid #292D28',
               borderRadius: 'var(--radius-sm)',
-              padding: '12px'
+              padding: '12px',
+              transition: 'border-color 0.2s ease'
             }}
           >
             <div className="flex-between" style={{ marginBottom: '6px' }}>

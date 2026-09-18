@@ -10,7 +10,12 @@
   padding: 0;
 }
 
-html, body {
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
   height: 100%;
   width: 100%;
   background-color: var(--bg-primary);
@@ -26,7 +31,9 @@ html, body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 #root {
@@ -36,23 +43,41 @@ html, body {
   background: transparent;
 }
 
-/* Custom Scrollbars */
+/* Super Smooth Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0D0C;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #292D28;
-  border-radius: 2px;
+  background: rgba(111, 116, 108, 0.28);
+  border-radius: 4px;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A4039;
+  background: rgba(200, 211, 90, 0.55);
+}
+
+/* Butter-Smooth Page Transition */
+.page-transition-wrapper {
+  animation: polarPageFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes polarPageFadeIn {
+  0% {
+    opacity: 0.85;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Typography Classes */
@@ -138,7 +163,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   position: relative;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .tech-card:hover,
@@ -163,13 +189,21 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.04em;
   padding: 7px 16px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .btn-primary-action:hover,
 .btn-engage:hover {
   background: #D8E36C;
   border-color: #D8E36C;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 211, 90, 0.2);
+}
+
+.btn-primary-action:active,
+.btn-engage:active {
+  transform: scale(0.98);
 }
 
 .btn-tactical,
@@ -187,14 +221,45 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   padding: 6px 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .btn-tactical:hover,
 .btn-secondary:hover {
   border-color: var(--accent-chartreuse);
   color: #ffffff;
-  background: rgba(200, 211, 90, 0.05);
+  background: rgba(200, 211, 90, 0.08);
+  transform: translateY(-1px);
+}
+
+.btn-tactical:active,
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-polar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 21, 18, 0.9);
+  border: 1px solid #292D28;
+  color: #E8E6D9;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.btn-polar:hover {
+  background: #1D231D;
+  border-color: var(--accent-chartreuse);
+  color: var(--accent-chartreuse);
+  transform: translateY(-1px);
+}
+
+.btn-polar:active {
+  transform: scale(0.96);
 }
 
 .btn-hazard-override {
@@ -213,6 +278,16 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
   padding: 6px 12px;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-hazard-override:hover {
+  background: rgba(216, 92, 62, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-hazard-override:active {
+  transform: scale(0.98);
 }
 
 /* Telemetry Chips */
@@ -270,16 +345,70 @@ input, select, textarea {
   font-family: var(--font-sans);
   font-size: 13px;
   padding: 8px 12px;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--accent-chartreuse);
+  box-shadow: 0 0 0 1px rgba(200, 211, 90, 0.25);
 }
 
 input::placeholder, textarea::placeholder {
   color: var(--text-muted);
+}
+
+/* Super-Smooth Scientific Range Sliders */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: #202621;
+  border-radius: 3px;
+  outline: none;
+  border: 1px solid #292D28;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+input[type="range"]:hover {
+  background: #29332A;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--accent-chartreuse);
+  border: 1px solid #0B0D0C;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(200, 211, 90, 0.5);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #D8E36C;
+  box-shadow: 0 0 12px rgba(200, 211, 90, 0.8);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--accent-chartreuse);
+  border: 1px solid #0B0D0C;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(200, 211, 90, 0.5);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Flex Utilities */
@@ -318,10 +447,11 @@ input::placeholder, textarea::placeholder {
   padding: 8px 12px;
   border-bottom: 1px solid #181C18;
   color: var(--text-primary);
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .tactical-table tr:hover td {
-  background: rgba(200, 211, 90, 0.04);
+  background: rgba(200, 211, 90, 0.05);
 }
 
 .tactical-table tr.selected td {

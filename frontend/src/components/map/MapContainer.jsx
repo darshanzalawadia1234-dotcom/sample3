@@ -34,13 +34,13 @@ export default function MapContainer({
     fitOperationsBounds
   } = useMapState();
 
-  const [mouseCoords, setMouseCoords] = useState({ lat: -65.2, lon: -58.0 });
+  const coordOverlayRef = useRef(null);
 
   // Initialize Leaflet map safely once
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return;
 
-    // Create map centered on Antarctic Peninsula / Weddell Gateway with balanced zoom
+    // Create map centered on Antarctic Peninsula / Weddell Gateway with liquid-smooth inertia and physics
     const map = L.map(mapRef.current, {
       center: center || [-65.2, -58.0],
       zoom: zoom || 2.4,
@@ -48,17 +48,28 @@ export default function MapContainer({
       maxZoom: 8,
       zoomSnap: 0.25,
       zoomDelta: 0.5,
-      wheelPxPerZoomLevel: 120,
+      wheelPxPerZoomLevel: 90,
+      wheelDebounceTime: 25,
       zoomControl: false,
       attributionControl: true,
-      preferCanvas: true // Fast HTML5 Canvas vector rendering
+      preferCanvas: true, // Fast HTML5 Canvas vector rendering
+      inertia: true,
+      inertiaDeceleration: 3200,
+      inertiaMaxSpeed: 2400,
+      easeLinearity: 0.18,
+      zoomAnimation: true,
+      fadeAnimation: true,
+      markerZoomAnimation: true
     });
 
     // High-performance dark polar cartography basemap (100% free, no API key watermark)
+    // keepBuffer: 6 keeps surrounding tiles resident in memory for seamless panning without grey flicker
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: '&copy; Esri &mdash; Polar Cartographic Bathymetry',
       maxZoom: 8,
-      keepBuffer: 2
+      keepBuffer: 6,
+      updateWhenIdle: false,
+      updateWhenZooming: true
     }).addTo(map);
 
     // Layer groups for dynamic toggling
@@ -67,11 +78,16 @@ export default function MapContainer({
     routesGroupRef.current = L.layerGroup().addTo(map);
     markersGroupRef.current = L.layerGroup().addTo(map);
 
-    // Mouse coordinate tracker
+    // Ultra-smooth direct-DOM mouse coordinate tracking (Zero React re-renders)
+    let rafCoord = null;
     map.on('mousemove', (e) => {
-      const { lat, lng } = e.latlng;
-      setMouseCoords({ lat, lon: lng });
-      setCursorCoordinates({ lat, lon: lng });
+      if (rafCoord) return;
+      rafCoord = requestAnimationFrame(() => {
+        rafCoord = null;
+        if (coordOverlayRef.current) {
+          coordOverlayRef.current.textContent = `${formatLatitude(e.latlng.lat)}  ${formatLongitude(e.latlng.lng)}`;
+        }
+      });
     });
 
     leafletMapRef.current = map;
@@ -81,7 +97,7 @@ export default function MapContainer({
     const initialTimer = setTimeout(() => {
       if (map) {
         map.invalidateSize();
-        map.fitBounds([[-70.5, -71.0], [-59.5, -43.0]], { padding: [16, 16], maxZoom: 3.2 });
+        map.fitBounds([[-70.5, -71.0], [-59.5, -43.0]], { padding: [16, 16], maxZoom: 3.2, animate: true, duration: 0.6 });
       }
     }, 150);
 
@@ -96,6 +112,7 @@ export default function MapContainer({
 
     return () => {
       clearTimeout(initialTimer);
+      if (rafCoord) cancelAnimationFrame(rafCoord);
       if (resizeObserver) resizeObserver.disconnect();
       map.remove();
       leafletMapRef.current = null;
@@ -514,11 +531,11 @@ export default function MapContainer({
         </button>
       </div>
 
-      {/* Live Map Coordinate Crosshair Readout */}
+      {/* Live Map Coordinate Crosshair Readout (Zero-Lag Direct DOM) */}
       <div className="map-coordinate-overlay">
-        <Target size={12} color="var(--accent-ice)" />
-        <span>
-          {formatLatitude(mouseCoords.lat)}&nbsp;&nbsp;{formatLongitude(mouseCoords.lon)}
+        <Target size={12} color="var(--accent-chartreuse)" />
+        <span ref={coordOverlayRef} style={{ letterSpacing: '0.04em' }}>
+          65°12.0' S&nbsp;&nbsp;058°00.0' W
         </span>
       </div>
     </div>

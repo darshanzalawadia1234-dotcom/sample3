@@ -7,7 +7,7 @@ export default function Environment() {
   const [coords, setCoords] = useState({ lat: -64.82, lon: -58.25 });
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '18px', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', color: '#E8E6D9', padding: '24px 28px', gap: '18px', overflowY: 'auto' }}>
       {/* Header matching Section 16 */}
       <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
         <div className="page-eyebrow">ATMOSPHERE · OCEAN · ICE</div>
@@ -44,7 +44,10 @@ export default function Environment() {
         {/* Right: CURRENT CONDITIONS */}
         <div
           style={{
-            backgroundColor: '#121512',
+            backgroundColor: 'rgba(18, 21, 18, 0.65)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             padding: '18px',

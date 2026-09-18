@@ -21,7 +21,7 @@ export default function SeaIce() {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
       {/* Page Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
         <div>
@@ -36,10 +36,11 @@ export default function SeaIce() {
             <button
               key={h}
               onClick={() => setHorizon(h)}
+              className="btn-polar"
               style={{
-                background: horizon === h ? '#C8D35A' : '#121512',
+                background: horizon === h ? '#C8D35A' : 'rgba(18, 21, 18, 0.7)',
                 color: horizon === h ? '#0B0D0C' : '#9A9D93',
-                border: `1px solid ${horizon === h ? '#C8D35A' : '#292D28'}`,
+                borderColor: horizon === h ? '#C8D35A' : '#292D28',
                 borderRadius: '2px',
                 padding: '4px 10px',
                 fontFamily: 'var(--font-mono)',
@@ -71,10 +72,13 @@ export default function SeaIce() {
       {/* Section 14: CONCENTRATION SCALE (Grayscale / Neutral Gradient) */}
       <div
         style={{
-          backgroundColor: '#121512',
+          backgroundColor: 'rgba(18, 21, 18, 0.65)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
           border: '1px solid #292D28',
           borderRadius: 'var(--radius-sm)',
-          padding: '12px 18px'
+          padding: '14px 20px'
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
@@ -107,7 +111,10 @@ export default function SeaIce() {
       {/* Section 14: CONCENTRATION HISTORY AND FORECAST (Clean Scientific Chart) */}
       <div
         style={{
-          backgroundColor: '#121512',
+          backgroundColor: 'rgba(18, 21, 18, 0.65)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
           border: '1px solid #292D28',
           borderRadius: 'var(--radius-sm)',
           padding: '18px'
@@ -131,7 +138,10 @@ export default function SeaIce() {
       {/* Section 14: HISTORICAL QUERY */}
       <div
         style={{
-          backgroundColor: '#121512',
+          backgroundColor: 'rgba(18, 21, 18, 0.65)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
           border: '1px solid #292D28',
           borderRadius: 'var(--radius-sm)',
           padding: '18px'

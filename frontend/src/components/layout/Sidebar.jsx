@@ -144,6 +144,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
                 key={item.to}
                 to={item.to}
                 onClick={() => setMobileOpen && setMobileOpen(false)}
+                className="sidebar-nav-item"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -157,7 +158,8 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
                   fontFamily: 'var(--font-sans)',
                   fontWeight: isActive ? 600 : 400,
                   letterSpacing: '0.08em',
-                  transition: 'background-color 0.15s ease, color 0.15s ease'
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  willChange: 'transform'
                 }}
               >
                 <Icon size={15} color={isActive ? '#C8D35A' : '#6F746C'} style={{ flexShrink: 0 }} />
@@ -166,6 +168,14 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
             );
           })}
         </nav>
+
+        <style>{`
+          .sidebar-nav-item:hover {
+            transform: translateX(2px);
+            color: #E8E6D9 !important;
+            background-color: rgba(200, 211, 90, 0.05) !important;
+          }
+        `}</style>
 
         {/* Section 7: Sidebar System Status Display */}
         <div

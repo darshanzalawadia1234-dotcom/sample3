@@ -29,21 +29,27 @@ export default function PolarShaderBackground({ opacity = 0.55 }) {
     if (!gl) return;
 
     // Use low-resolution internal buffer for ambient shader (10x faster)
+    let resizeTimer = null;
     function syncSize() {
       if (!canvas) return;
       const w = window.innerWidth || 1280;
       const h = window.innerHeight || 720;
-      const scale = 0.28; // 28% resolution delivers smooth ambient glow at 90%+ lower GPU cost
-      const targetW = Math.max(280, Math.floor(w * scale));
-      const targetH = Math.max(180, Math.floor(h * scale));
+      const scale = 0.25; // 25% resolution delivers silky ambient glow at 95% lower GPU cost
+      const targetW = Math.max(260, Math.floor(w * scale));
+      const targetH = Math.max(160, Math.floor(h * scale));
       if (canvas.width !== targetW || canvas.height !== targetH) {
         canvas.width = targetW;
         canvas.height = targetH;
       }
     }
 
+    function debouncedSyncSize() {
+      if (resizeTimer) cancelAnimationFrame(resizeTimer);
+      resizeTimer = requestAnimationFrame(syncSize);
+    }
+
     syncSize();
-    window.addEventListener('resize', syncSize);
+    window.addEventListener('resize', debouncedSyncSize, { passive: true });
 
     const vs = `
       attribute vec2 a_pos;
@@ -142,25 +148,31 @@ export default function PolarShaderBackground({ opacity = 0.55 }) {
     const uTime = gl.getUniformLocation(program, 'u_time');
     const uRes = gl.getUniformLocation(program, 'u_res');
 
-    function render(timestamp) {
-      // Throttle to max 30 FPS for zero lag on bridge workstations
-      if (timestamp - lastRenderTime >= 32) {
-        lastRenderTime = timestamp;
-        if (canvas && gl && document.visibilityState !== 'hidden') {
-          gl.viewport(0, 0, canvas.width, canvas.height);
-          if (uTime) gl.uniform1f(uTime, timestamp * 0.001);
-          if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
-          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        }
-      }
+    let lastTime = performance.now();
+    let currentT = 0;
+
+    function render(now) {
       animationFrameId = requestAnimationFrame(render);
+      if (document.visibilityState === 'hidden') return;
+
+      const delta = Math.min(now - lastTime, 64); // Clamp large delta after tab switch
+      lastTime = now;
+      currentT += delta * 0.00075; // Majestic, liquid-smooth polar drift
+
+      if (canvas && gl) {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        if (uTime) gl.uniform1f(uTime, currentT);
+        if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
     }
 
     animationFrameId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', syncSize);
+      if (resizeTimer) cancelAnimationFrame(resizeTimer);
+      window.removeEventListener('resize', debouncedSyncSize);
     };
   }, []);
 
@@ -175,7 +187,8 @@ export default function PolarShaderBackground({ opacity = 0.55 }) {
         zIndex: 0,
         opacity,
         overflow: 'hidden',
-        willChange: 'opacity'
+        willChange: 'opacity',
+        contain: 'strict'
       }}
       aria-hidden="true"
     >
@@ -185,9 +198,11 @@ export default function PolarShaderBackground({ opacity = 0.55 }) {
           display: 'block',
           width: '100%',
           height: '100%',
-          filter: 'blur(24px)', // Soft Gaussian upscaling makes low-res look like smooth aurora
-          transform: 'scale(1.05)',
-          transformOrigin: 'center center'
+          filter: 'blur(28px)', // Soft Gaussian upscaling creates seamless ambient polar glow
+          transform: 'scale(1.08) translateZ(0)',
+          transformOrigin: 'center center',
+          willChange: 'transform',
+          backfaceVisibility: 'hidden'
         }}
       />
     </div>

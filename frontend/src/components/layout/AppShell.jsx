@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import OperationsStrip from './OperationsStrip';
@@ -9,6 +9,7 @@ export default function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [shaderEnabled, setShaderEnabled] = useState(true);
+  const location = useLocation();
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: 'transparent', position: 'relative', overflow: 'hidden' }}>
@@ -31,7 +32,7 @@ export default function AppShell() {
           height: '100vh',
           minWidth: 0,
           marginLeft: collapsed ? 'var(--sidebar-collapsed-width)' : 'var(--sidebar-width)',
-          transition: 'margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+          transition: 'margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
         className="main-viewport"
       >
@@ -41,9 +42,25 @@ export default function AppShell() {
         {/* Live Operations Telemetry Strip */}
         <OperationsStrip />
 
-        {/* Main Routed Page Content */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY: 'auto' }}>
-          <Outlet />
+        {/* Main Routed Page Content with Liquid Smooth Transitions */}
+        <main
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            overflowY: 'auto',
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <div
+            key={location.pathname}
+            className="page-transition-wrapper"
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100%' }}
+          >
+            <Outlet />
+          </div>
         </main>
       </div>
 
