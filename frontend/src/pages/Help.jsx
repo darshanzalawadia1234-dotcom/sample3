@@ -47,12 +47,16 @@ export default function Help() {
   ];
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
-      {/* Header matching Section 20 */}
-      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
-        <div className="page-eyebrow">OPERATOR REFERENCE</div>
-        <h1 className="page-title-serif" style={{ fontSize: '32px' }}>Using the system</h1>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', color: '#E8E6D9', padding: '24px 32px', gap: '22px', overflowY: 'auto' }}>
+      {/* Header matching user reference */}
+      <div style={{ paddingBottom: '16px' }}>
+        <div className="page-eyebrow" style={{ color: '#6F746C', letterSpacing: '0.14em', marginBottom: '6px' }}>
+          OPERATOR REFERENCE
+        </div>
+        <h1 className="page-title-serif" style={{ fontSize: '36px', fontWeight: 400, color: '#E8E6D9', margin: 0 }}>
+          Using the system
+        </h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#6F746C', marginTop: '6px' }}>
           A concise guide to forecasts, route decisions, risk, and data provenance.
         </p>
       </div>
@@ -72,9 +76,11 @@ export default function Help() {
           style={{
             position: 'sticky',
             top: '20px',
-            backgroundColor: '#121512',
-            border: '1px solid #292D28',
-            borderRadius: 'var(--radius-sm)',
+            backgroundColor: 'rgba(18, 21, 18, 0.65)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid #222621',
+            borderRadius: '4px',
             padding: '12px 0',
             display: 'flex',
             flexDirection: 'column'

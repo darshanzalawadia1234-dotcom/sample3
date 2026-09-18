@@ -15,25 +15,29 @@ export default function Settings() {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', color: '#E8E6D9', padding: '24px 32px', gap: '22px', overflowY: 'auto' }}>
       {/* Header */}
-      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
-        <div className="page-eyebrow">CONSOLE PARAMETERS</div>
-        <h1 className="page-title-serif" style={{ fontSize: '32px' }}>System settings</h1>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+      <div style={{ paddingBottom: '16px' }}>
+        <div className="page-eyebrow" style={{ color: '#6F746C', letterSpacing: '0.14em', marginBottom: '6px' }}>
+          CONSOLE PARAMETERS
+        </div>
+        <h1 className="page-title-serif" style={{ fontSize: '36px', fontWeight: 400, color: '#E8E6D9', margin: 0 }}>
+          System settings
+        </h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#6F746C', marginTop: '6px' }}>
           Configure operational telemetry feeds, coordinate formats, risk thresholds, and operator security keys.
         </p>
       </div>
 
       {/* Tabs matching Section 23 */}
-      <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid #292D28', paddingBottom: '10px' }}>
+      <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid #222621', paddingBottom: '10px' }}>
         {sections.map((s) => (
           <button
             key={s}
             onClick={() => setActiveTab(s)}
             style={{
-              background: activeTab === s ? '#151915' : 'transparent',
-              color: activeTab === s ? '#C8D35A' : '#9A9D93',
+              background: activeTab === s ? 'rgba(200, 211, 90, 0.12)' : 'transparent',
+              color: activeTab === s ? '#C8D35A' : '#6F746C',
               border: `1px solid ${activeTab === s ? '#C8D35A' : 'transparent'}`,
               borderRadius: '2px',
               padding: '6px 14px',
@@ -48,12 +52,14 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* Section Content */}
+      {/* Settings Form Body Card */}
       <div
         style={{
-          backgroundColor: '#121512',
-          border: '1px solid #292D28',
-          borderRadius: 'var(--radius-sm)',
+          backgroundColor: 'rgba(18, 21, 18, 0.65)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid #222621',
+          borderRadius: '4px',
           padding: '24px',
           maxWidth: '680px'
         }}

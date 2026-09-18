@@ -82,7 +82,7 @@ export default function Vessels() {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', color: '#E8E6D9', padding: '24px 32px', gap: '22px', overflowY: 'auto' }}>
       {/* Toast Confirmation */}
       {toastMessage && (
         <div
@@ -109,93 +109,100 @@ export default function Vessels() {
         </div>
       )}
 
-      {/* Header matching Section 17 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
+      {/* Header matching user reference */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: '16px' }}>
         <div>
-          <div className="page-eyebrow">FLEET REGISTRY · {ships.length} ACTIVE</div>
-          <h1 className="page-title-serif" style={{ fontSize: '32px' }}>Expedition fleet</h1>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+          <div className="page-eyebrow" style={{ color: '#6F746C', letterSpacing: '0.14em', marginBottom: '6px' }}>
+            FLEET REGISTRY · {ships.length} ACTIVE
+          </div>
+          <h1 className="page-title-serif" style={{ fontSize: '36px', fontWeight: 400, color: '#E8E6D9', margin: 0 }}>
+            Expedition fleet
+          </h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#6F746C', marginTop: '6px' }}>
             Registered vessel particulars, current fixes, fuel profiles, and destinations.
           </p>
         </div>
 
-        <button onClick={handleOpenAdd} className="btn-primary-action">
+        <button onClick={handleOpenAdd} className="btn-primary-action" style={{ padding: '8px 16px', fontSize: '12px' }}>
           <Plus size={14} />
           <span>Add vessel</span>
         </button>
       </div>
 
-      {/* Section 17: Vertical List of Vessels with Subtle Borders and Generous Spacing */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Vertical List of Vessels with Subtle Borders and Generous Spacing */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {ships.map((ship) => {
           const latStr = formatLatitude(ship.latitude);
           const lonStr = formatLongitude(ship.longitude);
+          const iceClassDisplay = ship.iceClass?.includes('(') ? ship.iceClass : `${ship.iceClass || 'PC 5'} (${ship.iceClass?.replace(' ', '') === 'PC3' ? 'Polar Class 3' : ship.iceClass?.replace(' ', '') === 'PC4' ? 'Polar Class 4' : 'Polar Class 5'})`;
 
           return (
             <div
               key={ship.id}
               style={{
-                backgroundColor: '#121512',
-                border: '1px solid #292D28',
-                borderRadius: 'var(--radius-sm)',
-                padding: '16px 20px',
+                backgroundColor: 'rgba(18, 21, 18, 0.65)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '1px solid #222621',
+                borderRadius: '4px',
+                padding: '20px 24px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '16px',
+                gap: '24px',
                 flexWrap: 'wrap',
-                transition: 'border-color 0.15s ease'
+                transition: 'border-color 0.15s ease, background-color 0.15s ease'
               }}
             >
               {/* Left Column: Vessel Identity */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: '240px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '18px', minWidth: '280px' }}>
                 <div
                   style={{
-                    width: '34px',
-                    height: '34px',
-                    backgroundColor: '#0B0D0C',
+                    width: '38px',
+                    height: '38px',
+                    backgroundColor: 'rgba(11, 13, 12, 0.8)',
                     border: '1px solid #292D28',
-                    borderRadius: '2px',
+                    borderRadius: '3px',
                     display: 'grid',
                     placeItems: 'center',
-                    color: '#C8D35A'
+                    color: '#6F746C'
                   }}
                 >
-                  <Ship size={16} />
+                  <Ship size={18} />
                 </div>
 
                 <div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: '#6F746C', letterSpacing: '0.12em' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: '#6F746C', letterSpacing: '0.14em' }}>
                     RESEARCH VESSEL
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, color: '#E8E6D9', marginTop: '2px' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: '#E8E6D9', marginTop: '3px', letterSpacing: '0.04em' }}>
                     {ship.name.toUpperCase()}
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#9A9D93', marginTop: '2px' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#6F746C', marginTop: '3px' }}>
                     {latStr} · {lonStr}
                   </div>
                 </div>
               </div>
 
               {/* Middle Column: Speed & Ice Class */}
-              <div style={{ display: 'flex', gap: '32px', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', gap: '48px', fontFamily: 'var(--font-mono)', flex: 1, justifyContent: 'center' }}>
                 <div>
-                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>SPEED</div>
-                  <div style={{ color: '#E8E6D9', fontSize: '13px', fontWeight: 500, marginTop: '2px' }}>
+                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em' }}>SPEED</div>
+                  <div style={{ color: '#9A9D93', fontSize: '13px', fontWeight: 500, marginTop: '3px' }}>
                     {ship.normalSpeed || 14.2} kn
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>ICE CLASS</div>
-                  <div style={{ color: '#C8D35A', fontSize: '13px', fontWeight: 500, marginTop: '2px' }}>
-                    {ship.iceClass || 'PC 5'}
+                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em' }}>ICE CLASS</div>
+                  <div style={{ color: '#C8D35A', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>
+                    {iceClassDisplay}
                   </div>
                 </div>
 
                 <div>
-                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>DESTINATION</div>
-                  <div style={{ color: '#9A9D93', fontSize: '13px', marginTop: '2px' }}>
+                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em' }}>DESTINATION</div>
+                  <div style={{ color: '#6F746C', fontSize: '13px', marginTop: '3px' }}>
                     {ship.destination || 'Rothera Station'}
                   </div>
                 </div>
@@ -206,25 +213,26 @@ export default function Vessels() {
                 <Link
                   to={`/vessels/${ship.id}`}
                   className="btn-secondary"
-                  style={{ textDecoration: 'none', fontSize: '11px', padding: '6px 12px' }}
+                  style={{ textDecoration: 'none', fontSize: '11.5px', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'transparent' }}
                 >
                   <span>Open record</span>
-                  <ArrowRight size={12} />
+                  <ArrowRight size={13} />
                 </Link>
 
                 <button
                   onClick={(e) => handleDelete(e, ship.id, ship.name)}
                   style={{
-                    background: 'none',
+                    background: 'transparent',
                     border: '1px solid #292D28',
                     color: '#6F746C',
-                    padding: '6px 8px',
                     borderRadius: '2px',
+                    padding: '7px 10px',
                     cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center'
+                    display: 'grid',
+                    placeItems: 'center'
                   }}
                   title="Remove vessel"
+                  aria-label="Remove vessel"
                 >
                   <Trash2 size={13} />
                 </button>

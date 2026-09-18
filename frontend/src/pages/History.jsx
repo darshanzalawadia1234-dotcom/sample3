@@ -17,12 +17,16 @@ export default function History() {
   ];
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
-      {/* Header matching Section 19 */}
-      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
-        <div className="page-eyebrow">OBSERVATION ARCHIVE</div>
-        <h1 className="page-title-serif" style={{ fontSize: '32px' }}>Historical data</h1>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', color: '#E8E6D9', padding: '24px 32px', gap: '22px', overflowY: 'auto' }}>
+      {/* Header matching user reference */}
+      <div style={{ paddingBottom: '16px' }}>
+        <div className="page-eyebrow" style={{ color: '#6F746C', letterSpacing: '0.14em', marginBottom: '6px' }}>
+          OBSERVATION ARCHIVE
+        </div>
+        <h1 className="page-title-serif" style={{ fontSize: '36px', fontWeight: 400, color: '#E8E6D9', margin: 0 }}>
+          Historical data
+        </h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#6F746C', marginTop: '6px' }}>
           Query recorded environmental observations and completed routing analyses.
         </p>
       </div>
@@ -30,10 +34,12 @@ export default function History() {
       {/* Archive Query Panel */}
       <div
         style={{
-          backgroundColor: '#121512',
-          border: '1px solid #292D28',
-          borderRadius: 'var(--radius-sm)',
-          padding: '18px'
+          backgroundColor: 'rgba(18, 21, 18, 0.65)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid #222621',
+          borderRadius: '4px',
+          padding: '20px 24px'
         }}
       >
         {/* Tabs */}
