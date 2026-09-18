@@ -57,7 +57,7 @@ export default function SeaIce() {
       {/* UPPER AREA: Scientific Sea-Ice Map Visualization */}
       <div
         style={{
-          height: '420px',
+          height: '330px',
           backgroundColor: '#0B0F0D',
           border: '1px solid #292D28',
           borderRadius: 'var(--radius-sm)',

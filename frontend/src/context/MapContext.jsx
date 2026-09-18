@@ -17,12 +17,12 @@ const DEFAULT_LAYERS = {
 };
 
 export function MapProvider({ children }) {
-  const [center, setCenter] = useState([-68.0, -45.0]); // Southern Ocean / Weddell Gateway
-  const [zoom, setZoom] = useState(3);
+  const [center, setCenter] = useState([-65.2, -58.0]); // Antarctic Peninsula / Weddell Gateway
+  const [zoom, setZoom] = useState(2.4);
   const [activeLayers, setActiveLayers] = useState(DEFAULT_LAYERS);
   const [selectedIcebergId, setSelectedIcebergId] = useState(null);
   const [selectedSegmentId, setSelectedSegmentId] = useState(null);
-  const [cursorCoordinates, setCursorCoordinates] = useState({ lat: -65.5, lon: -60.0 });
+  const [cursorCoordinates, setCursorCoordinates] = useState({ lat: -65.2, lon: -58.0 });
   const [mapInstance, setMapInstance] = useState(null);
 
   const toggleLayer = (layerKey) => {
@@ -32,16 +32,26 @@ export function MapProvider({ children }) {
     }));
   };
 
-  const flyTo = (lat, lon, targetZoom = 6) => {
+  const flyTo = (lat, lon, targetZoom = 4) => {
     setCenter([lat, lon]);
     setZoom(targetZoom);
     if (mapInstance && typeof mapInstance.flyTo === 'function') {
-      mapInstance.flyTo([lat, lon], targetZoom, { duration: 1.2 });
+      mapInstance.flyTo([lat, lon], targetZoom, { duration: 1.0 });
     }
   };
 
   const resetView = () => {
-    flyTo(-65.5, -60.0, 4);
+    if (mapInstance && typeof mapInstance.fitBounds === 'function') {
+      mapInstance.fitBounds([[-70.5, -71.0], [-59.5, -43.0]], { padding: [20, 20], maxZoom: 3.5 });
+    } else {
+      flyTo(-65.2, -58.0, 2.4);
+    }
+  };
+
+  const fitOperationsBounds = () => {
+    if (mapInstance && typeof mapInstance.fitBounds === 'function') {
+      mapInstance.fitBounds([[-70.5, -71.0], [-59.5, -43.0]], { padding: [20, 20], maxZoom: 3.5 });
+    }
   };
 
   return (
@@ -61,6 +71,7 @@ export function MapProvider({ children }) {
         setCursorCoordinates,
         flyTo,
         resetView,
+        fitOperationsBounds,
         mapInstance,
         setMapInstance
       }}

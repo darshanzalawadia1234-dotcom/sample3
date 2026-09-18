@@ -50,62 +50,27 @@ export default function Dashboard() {
         position: 'relative'
       }}
     >
-      {/* Main Grid: Large Map + Information Panels */}
+      {/* Main Grid: Balanced Map + Operations Side Panel */}
       <div
         style={{
-          flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1fr 360px',
+          gridTemplateColumns: '1fr 380px',
           minHeight: 0,
           position: 'relative'
         }}
         className="dashboard-main-grid"
       >
-        {/* LEFT: Large Antarctic Sea-Ice Scientific Map Visualization */}
+        {/* LEFT: Antarctic Sea-Ice Scientific Map Visualization */}
         <div
           style={{
             position: 'relative',
-            height: '100%',
-            minHeight: '380px',
-            maxHeight: 'calc(100vh - 160px)',
+            height: '420px',
             backgroundColor: 'var(--map-bg)',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            borderRight: '1px solid #292D28',
+            borderBottom: '1px solid #292D28'
           }}
         >
-          {/* Scientific Map Legend Overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '16px',
-              left: '16px',
-              zIndex: 500,
-              backgroundColor: 'rgba(13, 16, 14, 0.92)',
-              border: '1px solid #292D28',
-              borderRadius: '2px',
-              padding: '10px 14px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '10px'
-            }}
-          >
-            <div style={{ color: '#6F746C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
-              CHART LEGEND · WGS 84
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '16px', height: '2px', backgroundColor: '#C8D35A', display: 'inline-block' }} />
-                <span style={{ color: '#E8E6D9' }}>Recommended Route</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '16px', height: '2px', backgroundColor: '#D85C3E', display: 'inline-block' }} />
-                <span style={{ color: '#E8E6D9' }}>Hazard Corridor</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '16px', height: '2px', borderBottom: '1px dashed #E8E6D9', display: 'inline-block' }} />
-                <span style={{ color: '#9A9D93' }}>Ice Edge Boundary</span>
-              </div>
-            </div>
-          </div>
-
           <MapContainer
             onSelectIceberg={(berg) => setInspectedIceberg(berg)}
             highlightedIcebergId={inspectedIceberg?.id}
@@ -125,12 +90,13 @@ export default function Dashboard() {
         <div
           style={{
             backgroundColor: '#0D100E',
-            borderLeft: '1px solid #292D28',
             padding: '18px',
             overflowY: 'auto',
+            height: '420px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px'
+            gap: '16px',
+            borderBottom: '1px solid #292D28'
           }}
           className="dashboard-side-panel"
         >

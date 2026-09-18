@@ -34,13 +34,13 @@ export default function Scenario() {
         </p>
       </div>
 
-      {/* Grid: Left Parameters + Right Map */}
+      {/* Main Grid: Left Controls + Right Map */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: '340px 1fr',
           gap: '18px',
-          minHeight: '480px'
+          height: '350px'
         }}
         className="scenario-split-grid"
       >
@@ -53,7 +53,9 @@ export default function Scenario() {
             padding: '18px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px'
+            gap: '14px',
+            height: '350px',
+            overflowY: 'auto'
           }}
         >
           <div className="technical-label">SCENARIO INPUT PARAMETERS</div>
@@ -155,7 +157,7 @@ export default function Scenario() {
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            minHeight: '460px'
+            height: '350px'
           }}
         >
           <MapContainer />

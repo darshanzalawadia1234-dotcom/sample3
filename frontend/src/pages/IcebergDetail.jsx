@@ -72,9 +72,25 @@ export default function IcebergDetail() {
       </div>
 
       {/* Main Grid: Left Map with Trajectory Overlay, Right Milestones and Charts */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 420px', minHeight: 0 }} className="trajectory-grid">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 420px',
+          height: '480px',
+          borderBottom: '1px solid #292D28'
+        }}
+        className="trajectory-grid"
+      >
         {/* Map with Active Trajectory */}
-        <div style={{ position: 'relative', height: '100%', minHeight: '400px' }}>
+        <div
+          style={{
+            position: 'relative',
+            height: '480px',
+            backgroundColor: 'var(--map-bg)',
+            overflow: 'hidden',
+            borderRight: '1px solid #292D28'
+          }}
+        >
           <MapContainer
             highlightedIcebergId={data.id}
           />
@@ -83,9 +99,10 @@ export default function IcebergDetail() {
         {/* Trajectory Milestones & Kinematic Charts */}
         <div
           style={{
-            backgroundColor: 'var(--bg-secondary)',
-            borderLeft: '1px solid var(--border-subtle)',
+            backgroundColor: '#0D100E',
+            borderLeft: '1px solid #292D28',
             padding: '16px',
+            height: '480px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',

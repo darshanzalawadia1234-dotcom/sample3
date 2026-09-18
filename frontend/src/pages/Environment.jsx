@@ -23,18 +23,18 @@ export default function Environment() {
           display: 'grid',
           gridTemplateColumns: '1fr 340px',
           gap: '18px',
-          minHeight: '520px'
+          height: '350px'
         }}
         className="env-split-grid"
       >
-        {/* Large Interactive Map */}
+        {/* Balanced Interactive Map */}
         <div
           style={{
             backgroundColor: '#0B0F0D',
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            minHeight: '480px'
+            height: '350px'
           }}
         >
           <MapContainer />
@@ -49,7 +49,9 @@ export default function Environment() {
             padding: '18px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px'
+            gap: '14px',
+            height: '350px',
+            overflowY: 'auto'
           }}
         >
           <div className="technical-label">CURRENT CONDITIONS</div>

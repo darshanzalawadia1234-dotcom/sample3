@@ -48,9 +48,9 @@ export default function Navigation() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '300px 1fr',
+          gridTemplateColumns: '320px 1fr',
           gap: '16px',
-          alignItems: 'stretch'
+          height: '370px'
         }}
         className="nav-split-grid"
       >
@@ -60,10 +60,12 @@ export default function Navigation() {
             backgroundColor: '#121512',
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
-            padding: '18px',
+            padding: '16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px'
+            gap: '10px',
+            height: '370px',
+            overflowY: 'auto'
           }}
         >
           <div className="technical-label">OPTIMIZATION PARAMETERS</div>
@@ -162,7 +164,7 @@ export default function Navigation() {
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            height: '350px'
+            height: '370px'
           }}
         >
           <MapContainer

@@ -91,9 +91,25 @@ export default function Icebergs() {
       </div>
 
       {/* Main Grid: Map on Left, Tracked Target List on Right */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 360px', minHeight: 0 }} className="iceberg-layout-grid">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 360px',
+          height: '460px',
+          borderBottom: '1px solid #292D28'
+        }}
+        className="iceberg-layout-grid"
+      >
         {/* Interactive Map */}
-        <div style={{ position: 'relative', height: '100%', minHeight: '400px' }}>
+        <div
+          style={{
+            position: 'relative',
+            height: '460px',
+            backgroundColor: 'var(--map-bg)',
+            overflow: 'hidden',
+            borderRight: '1px solid #292D28'
+          }}
+        >
           <MapContainer
             onSelectIceberg={handleSelectBerg}
             highlightedIcebergId={selectedBerg?.id}
@@ -110,12 +126,10 @@ export default function Icebergs() {
         {/* Iceberg Registry List Panel */}
         <div
           style={{
-            backgroundColor: 'rgba(13, 27, 52, 0.55)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            borderLeft: '1px solid var(--glass-border)',
-            boxShadow: 'var(--shadow-panel)',
+            backgroundColor: '#0D100E',
+            borderLeft: '1px solid #292D28',
             padding: '16px',
+            height: '460px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',

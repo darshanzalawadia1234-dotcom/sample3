@@ -30,34 +30,35 @@ export default function MapContainer({
     cursorCoordinates,
     setCursorCoordinates,
     setMapInstance,
-    resetView
+    resetView,
+    fitOperationsBounds
   } = useMapState();
 
-  const [mouseCoords, setMouseCoords] = useState({ lat: -64.82, lon: -58.25 });
+  const [mouseCoords, setMouseCoords] = useState({ lat: -65.2, lon: -58.0 });
 
   // Initialize Leaflet map safely once
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return;
 
-    // Create map centered on Antarctic Peninsula / Weddell Gateway
+    // Create map centered on Antarctic Peninsula / Weddell Gateway with balanced zoom
     const map = L.map(mapRef.current, {
-      center: center || [-68.0, -45.0],
-      zoom: zoom || 3,
-      minZoom: 2,
-      maxZoom: 9,
+      center: center || [-65.2, -58.0],
+      zoom: zoom || 2.4,
+      minZoom: 1.5,
+      maxZoom: 8,
+      zoomSnap: 0.25,
+      zoomDelta: 0.5,
+      wheelPxPerZoomLevel: 120,
       zoomControl: false,
       attributionControl: true,
-      preferCanvas: true // Use HTML5 Canvas for vector rendering (significantly faster!)
+      preferCanvas: true // Fast HTML5 Canvas vector rendering
     });
-
-    // Minimal square zoom control in top-right
-    L.control.zoom({ position: 'topright' }).addTo(map);
 
     // Dark cartographic ocean basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; CARTO | GEBCO Bathymetry',
       subdomains: 'abcd',
-      maxZoom: 9,
+      maxZoom: 8,
       keepBuffer: 2
     }).addTo(map);
 
@@ -77,7 +78,26 @@ export default function MapContainer({
     leafletMapRef.current = map;
     setMapInstance(map);
 
+    // Frame the operational area smoothly on mount without over-magnifying
+    const initialTimer = setTimeout(() => {
+      if (map) {
+        map.invalidateSize();
+        map.fitBounds([[-70.5, -71.0], [-59.5, -43.0]], { padding: [16, 16], maxZoom: 3.2 });
+      }
+    }, 150);
+
+    // Watch container size changes so map never distorts or crops
+    let resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined' && mapRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      resizeObserver.observe(mapRef.current);
+    }
+
     return () => {
+      clearTimeout(initialTimer);
+      if (resizeObserver) resizeObserver.disconnect();
       map.remove();
       leafletMapRef.current = null;
     };
@@ -142,19 +162,31 @@ export default function MapContainer({
 
     MOCK_SEA_ICE_CURRENT.regionalZones.forEach(zone => {
       const conc = zone.concentration;
-      let color = '#1D3557';
-      if (conc >= 80) color = '#E9F1F7';
-      else if (conc >= 60) color = '#A8DADC';
-      else if (conc >= 40) color = '#74B3CE';
-      else if (conc >= 20) color = '#457B9D';
+      let color = '#3E5042';
+      if (conc >= 80) color = '#C8D35A'; // Polar chartreuse pack ice
+      else if (conc >= 60) color = '#99AA52';
+      else if (conc >= 40) color = '#6B845C';
+      else if (conc >= 20) color = '#435848';
+
+      // Calibrate radar observation circle so it acts as an informative regional boundary instead of swallowing the continent
+      const visualRadius = Math.min(zone.radiusKm * 320, 80000);
 
       const circle = L.circle(zone.center, {
-        radius: zone.radiusKm * 1000,
+        radius: visualRadius,
         color: color,
-        weight: 1,
+        weight: 1.2,
         fillColor: color,
-        fillOpacity: conc / 170, // proportional transparency
-        dashArray: activeLayers.seaIceForecast ? '4, 4' : undefined
+        fillOpacity: Math.min(0.25, (conc / 280) + 0.05),
+        dashArray: activeLayers.seaIceForecast ? '4, 4' : '3, 4'
+      });
+
+      // Subtle center dot for each monitoring station
+      const centerDot = L.circleMarker(zone.center, {
+        radius: 3,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.9,
+        weight: 1
       });
 
       circle.bindPopup(`
@@ -162,7 +194,7 @@ export default function MapContainer({
           <div style="font-weight: 700; color: var(--text-primary); font-size: 11px; margin-bottom: 4px;">
             ${zone.name}
           </div>
-          <div style="color: var(--accent-ice); font-size: 12px; margin-bottom: 4px;">
+          <div style="color: #C8D35A; font-size: 12px; margin-bottom: 4px;">
             CONCENTRATION: <strong>${conc}%</strong>
           </div>
           <div style="color: var(--text-muted); font-size: 10px;">
@@ -172,6 +204,7 @@ export default function MapContainer({
       `);
 
       seaIceGroupRef.current.addLayer(circle);
+      seaIceGroupRef.current.addLayer(centerDot);
     });
   }, [activeLayers.seaIceCurrent, activeLayers.seaIceForecast]);
 
@@ -464,11 +497,21 @@ export default function MapContainer({
         </button>
         <button
           onClick={resetView}
-          title="Reset View to Antarctic Gateway"
+          title="Reset & Frame Antarctic Operations Corridor"
+          aria-label="Frame Operations"
           className="btn-polar"
           style={{ padding: '6px', minWidth: '32px', height: '32px' }}
         >
           <RotateCcw size={14} />
+        </button>
+        <button
+          onClick={fitOperationsBounds}
+          title="Auto-Fit Operations Bounds"
+          aria-label="Auto-Fit Bounds"
+          className="btn-polar"
+          style={{ padding: '6px', minWidth: '32px', height: '32px' }}
+        >
+          <Maximize2 size={13} />
         </button>
       </div>
 

@@ -74,17 +74,34 @@ export default function VesselDetail() {
       </div>
 
       {/* Main Grid: Left Map, Right Engineering & Metocean Specs */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 380px', minHeight: 0 }} className="vessel-detail-grid">
-        <div style={{ position: 'relative', height: '100%', minHeight: '400px' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 380px',
+          height: '460px',
+          borderBottom: '1px solid #292D28'
+        }}
+        className="vessel-detail-grid"
+      >
+        <div
+          style={{
+            position: 'relative',
+            height: '460px',
+            backgroundColor: 'var(--map-bg)',
+            overflow: 'hidden',
+            borderRight: '1px solid #292D28'
+          }}
+        >
           <MapContainer />
         </div>
 
         {/* Engineering & Operational Spec Panel */}
         <div
           style={{
-            backgroundColor: 'var(--bg-secondary)',
-            borderLeft: '1px solid var(--border-subtle)',
+            backgroundColor: '#0D100E',
+            borderLeft: '1px solid #292D28',
             padding: '16px',
+            height: '460px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
