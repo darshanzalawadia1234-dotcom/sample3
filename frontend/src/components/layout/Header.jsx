@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Bell, HelpCircle, Sliders, Menu, X, ShieldAlert } from 'lucide-react';
+import { Bell, HelpCircle, Sliders, Menu, X, ShieldAlert, User, LogIn, LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { formatUtcDateTime } from '../../utils/formatting';
+import authApi from '../../api/authApi';
 
 export default function Header({ onMenuClick }) {
   const { systemStatus, notifications, dismissNotification } = useApp();
   const location = useLocation();
   const [utcTime, setUtcTime] = useState(formatUtcDateTime());
   const [showNotifications, setShowNotifications] = useState(false);
+
+  // Auth state
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [authEmail, setAuthEmail] = useState('operator@antarctic.org');
+  const [authPassword, setAuthPassword] = useState('demopassword123');
+  const [authName, setAuthName] = useState('Dr. Sarah Evans');
+  const [authOrg, setAuthOrg] = useState('British Antarctic Survey');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
 
   // Real-time UTC clock ticker
   useEffect(() => {
@@ -17,6 +29,47 @@ export default function Header({ onMenuClick }) {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Fetch current user on mount
+  useEffect(() => {
+    authApi.getMe()
+      .then(user => setCurrentUser(user))
+      .catch(() => setCurrentUser(null));
+  }, []);
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+    try {
+      if (isSignUp) {
+        const res = await authApi.signup({
+          email: authEmail,
+          password: authPassword,
+          full_name: authName,
+          organization: authOrg,
+          role: 'operator'
+        });
+        setCurrentUser(res.user);
+      } else {
+        const res = await authApi.login({
+          email: authEmail,
+          password: authPassword
+        });
+        setCurrentUser(res.user);
+      }
+      setShowAuthModal(false);
+    } catch (err) {
+      setAuthError(err.message || 'Authentication failed. Please check credentials.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await authApi.logout();
+    setCurrentUser(null);
+  };
 
   const getPageTitle = (pathname) => {
     if (pathname === '/dashboard') return 'ANTARCTIC OPERATIONS COMMAND';
@@ -89,8 +142,8 @@ export default function Header({ onMenuClick }) {
         </div>
       </div>
 
-      {/* Center/Right: Data Status & UTC Clock */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+      {/* Center/Right: Data Status, Auth & Clock */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         {/* Telemetry Status Badge */}
         <div
           style={{
@@ -112,6 +165,63 @@ export default function Header({ onMenuClick }) {
           <span style={{ color: 'var(--border-medium)' }}>|</span>
           <span style={{ color: 'var(--text-secondary)' }}>{utcTime}</span>
         </div>
+
+        {/* User Auth Profile Badge / Button */}
+        {currentUser ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(91, 192, 190, 0.1)',
+              border: '1px solid rgba(91, 192, 190, 0.3)',
+              borderRadius: 'var(--radius-xs)',
+              padding: '4px 10px',
+              fontSize: '11px',
+              color: 'var(--accent-cyan)'
+            }}
+          >
+            <User size={13} />
+            <span style={{ fontWeight: 600, maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {currentUser.full_name || currentUser.email}
+            </span>
+            <button
+              onClick={handleLogout}
+              title="Sign Out"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0 2px'
+              }}
+            >
+              <LogOut size={12} />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(91, 192, 190, 0.15)',
+              border: '1px solid var(--accent-cyan)',
+              borderRadius: 'var(--radius-xs)',
+              padding: '4px 10px',
+              fontSize: '11px',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-mono)'
+            }}
+          >
+            <LogIn size={13} color="var(--accent-cyan)" />
+            <span>OPERATOR LOGIN</span>
+          </button>
+        )}
 
         {/* Action Icons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative' }}>
@@ -258,6 +368,147 @@ export default function Header({ onMenuClick }) {
           )}
         </div>
       </div>
+
+      {/* Supabase Auth Modal */}
+      {showAuthModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(5, 11, 26, 0.8)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 3000
+          }}
+        >
+          <div
+            className="tech-card"
+            style={{
+              width: '400px',
+              maxWidth: '90vw',
+              padding: '24px',
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--accent-cyan)',
+              boxShadow: '0 0 25px rgba(91, 192, 190, 0.2)'
+            }}
+          >
+            <div className="flex-between" style={{ marginBottom: '16px' }}>
+              <div>
+                <div className="technical-label">SUPABASE AUTHENTICATION</div>
+                <h3 className="mono-readout" style={{ fontSize: '15px', color: 'var(--text-primary)', margin: 0 }}>
+                  {isSignUp ? 'REGISTER POLAR OPERATOR' : 'OPERATOR LOGIN'}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {authError && (
+              <div
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid var(--risk-critical)',
+                  borderRadius: 'var(--radius-xs)',
+                  color: 'var(--risk-critical)',
+                  fontSize: '11.5px',
+                  marginBottom: '14px'
+                }}
+              >
+                {authError}
+              </div>
+            )}
+
+            <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {isSignUp && (
+                <>
+                  <div>
+                    <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                      FULL NAME
+                    </label>
+                    <input
+                      type="text"
+                      className="polar-input"
+                      value={authName}
+                      onChange={(e) => setAuthName(e.target.value)}
+                      required
+                      style={{ width: '100%', padding: '8px', background: 'var(--bg-primary)', color: '#fff', border: '1px solid var(--border-medium)' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                      INSTITUTE / ORGANIZATION
+                    </label>
+                    <input
+                      type="text"
+                      className="polar-input"
+                      value={authOrg}
+                      onChange={(e) => setAuthOrg(e.target.value)}
+                      required
+                      style={{ width: '100%', padding: '8px', background: 'var(--bg-primary)', color: '#fff', border: '1px solid var(--border-medium)' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                  OPERATOR EMAIL
+                </label>
+                <input
+                  type="email"
+                  className="polar-input"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', background: 'var(--bg-primary)', color: '#fff', border: '1px solid var(--border-medium)' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                  SECURITY PASSPHRASE
+                </label>
+                <input
+                  type="password"
+                  className="polar-input"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', background: 'var(--bg-primary)', color: '#fff', border: '1px solid var(--border-medium)' }}
+                />
+              </div>
+
+              <div style={{ marginTop: '6px', display: 'flex', gap: '10px' }}>
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="btn-polar btn-primary-action"
+                  style={{ flex: 1, padding: '10px' }}
+                >
+                  {authLoading ? 'AUTHENTICATING...' : (isSignUp ? 'CREATE ACCOUNT' : 'AUTHENTICATE')}
+                </button>
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(!isSignUp); setAuthError(''); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-ice)', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  {isSignUp ? 'Already registered? Sign In' : 'New operator? Create Account'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

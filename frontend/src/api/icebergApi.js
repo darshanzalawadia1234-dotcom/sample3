@@ -1,18 +1,26 @@
 import apiClient from './client';
-import { MOCK_ICEBERGS, MOCK_ROUTES } from './mockData';
+import { MOCK_ICEBERGS } from './mockData';
 
 export const icebergApi = {
   /**
    * Get list of all tracked icebergs
    * GET /api/icebergs
    */
-  async getAll() {
+  async getAll(bounds = null) {
     try {
-      const data = await apiClient.get('/api/icebergs');
-      return { icebergs: data.icebergs || data, isFallback: false };
+      let endpoint = '/api/icebergs';
+      if (bounds) {
+        const query = new URLSearchParams(bounds).toString();
+        endpoint += `?${query}`;
+      }
+      const data = await apiClient.get(endpoint);
+      return { ...data, isFallback: false };
     } catch (err) {
-      console.warn('Backend iceberg service unavailable, using polar tracking dataset', err.message);
-      return { icebergs: MOCK_ICEBERGS, isFallback: true };
+      console.warn('Backend iceberg service unavailable, using mock fallback', err);
+      return {
+        icebergs: [...MOCK_ICEBERGS],
+        isFallback: true
+      };
     }
   },
 
@@ -25,8 +33,9 @@ export const icebergApi = {
       const data = await apiClient.get(`/api/icebergs/${id}`);
       return { ...data, isFallback: false };
     } catch (err) {
-      const found = MOCK_ICEBERGS.find(b => b.id.toLowerCase() === id.toLowerCase()) || MOCK_ICEBERGS[0];
-      return { ...found, isFallback: true };
+      console.warn(`Backend iceberg ${id} unavailable, using mock fallback`, err);
+      const berg = MOCK_ICEBERGS.find(b => b.id === id || b.external_id === id) || MOCK_ICEBERGS[0];
+      return { ...berg, isFallback: true };
     }
   },
 
@@ -34,21 +43,21 @@ export const icebergApi = {
    * Get predicted drift trajectory for an iceberg
    * GET /api/icebergs/{id}/trajectory
    */
-  async getTrajectory(id) {
+  async getTrajectory(id, forecastHours = '6,12,18,24,48') {
     try {
-      const data = await apiClient.get(`/api/icebergs/${id}/trajectory`);
+      const data = await apiClient.get(`/api/icebergs/${id}/trajectory?forecast_hours=${forecastHours}`);
       return { ...data, isFallback: false };
     } catch (err) {
-      const found = MOCK_ICEBERGS.find(b => b.id.toLowerCase() === id.toLowerCase()) || MOCK_ICEBERGS[0];
+      console.warn(`Backend iceberg trajectory for ${id} unavailable, using mock fallback`, err);
+      const berg = MOCK_ICEBERGS.find(b => b.id === id || b.external_id === id) || MOCK_ICEBERGS[0];
       return {
-        id: found.id,
-        name: found.name,
-        currentPosition: { latitude: found.latitude, longitude: found.longitude },
-        speedKnots: found.speed,
-        headingDegrees: found.heading,
-        direction: found.direction,
-        predictionModel: 'Lagrangian Drift Model v1.2',
-        trajectory: found.trajectory,
+        id: berg.id,
+        name: berg.name,
+        currentPosition: { latitude: berg.latitude, longitude: berg.longitude },
+        speedKnots: berg.speed,
+        headingDegrees: berg.heading || berg.direction,
+        driftModel: 'Lagrangian Drift v1.2 (Coupled Ekman/Atmospheric)',
+        trajectory: berg.trajectory || [],
         isFallback: true
       };
     }
@@ -56,14 +65,25 @@ export const icebergApi = {
 
   /**
    * Get active proximity alerts
+   * GET /api/icebergs/alerts
    */
   async getAlerts() {
     try {
       const data = await apiClient.get('/api/icebergs/alerts');
-      return { alerts: data.alerts || [data], isFallback: false };
+      return { ...data, isFallback: false };
     } catch (err) {
+      console.warn('Backend iceberg alerts unavailable, using mock fallback', err);
       return {
-        alerts: [MOCK_ROUTES.proximityAlert],
+        alerts: [
+          {
+            id: 'alert-01',
+            icebergId: 'A-68A',
+            severity: 'CRITICAL',
+            closestPointOfApproachKm: 4.8,
+            timeToCpaHours: 2.5,
+            message: 'Iceberg A-68A projected to cross Rothera transit corridor in 2.5h'
+          }
+        ],
         isFallback: true
       };
     }

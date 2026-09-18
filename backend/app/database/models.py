@@ -1,10 +1,19 @@
 from datetime import datetime, timezone
-from typing import Optional, List
+from typing import Optional, List, Any
 from sqlalchemy import (
     Integer, String, Float, DateTime, ForeignKey, Text, JSON, Boolean, Index
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base, TimestampMixin
+
+class Profile(Base, TimestampMixin):
+    __tablename__ = "profiles"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)  # UUID string
+    full_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    organization: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    role: Mapped[str] = mapped_column(String(50), default="operator")
+
 
 class SeaIceObservation(Base, TimestampMixin):
     __tablename__ = "sea_ice_observations"
@@ -101,16 +110,24 @@ class OceanObservation(Base, TimestampMixin):
     source: Mapped[str] = mapped_column(String(100), default="DEMO_SYNTHETIC")
 
 
-class Ship(Base, TimestampMixin):
-    __tablename__ = "ships"
+class Vessel(Base, TimestampMixin):
+    __tablename__ = "vessels"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
+    vessel_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    registration_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)
+    imo_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, index=True)
+    call_sign: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    vessel_type: Mapped[str] = mapped_column(String(50), default="Research Vessel")
+    owner_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
     destination_latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     destination_longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     destination: Mapped[Optional[str]] = mapped_column(String(150), default="Rothera Station")
+
     max_speed: Mapped[float] = mapped_column(Float, default=15.0)             # knots
     normal_speed: Mapped[float] = mapped_column(Float, default=11.0)          # knots
     fuel_consumption_rate: Mapped[float] = mapped_column(Float, default=85.0) # L/nm
@@ -118,12 +135,25 @@ class Ship(Base, TimestampMixin):
     ice_class: Mapped[str] = mapped_column(String(100), default="PC3")
     status: Mapped[str] = mapped_column(String(50), default="OPERATIONAL")
 
+    @property
+    def name(self) -> str:
+        return self.vessel_name
+
+    @name.setter
+    def name(self, val: str):
+        self.vessel_name = val
+
+
+# Compatibility alias: Ship is synonymous with Vessel
+Ship = Vessel
+
 
 class RouteRequest(Base, TimestampMixin):
     __tablename__ = "route_requests"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    ship_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("ships.id"), nullable=True)
+    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
+    ship_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("vessels.id"), nullable=True, index=True)
     start_latitude: Mapped[float] = mapped_column(Float, nullable=False)
     start_longitude: Mapped[float] = mapped_column(Float, nullable=False)
     destination_latitude: Mapped[float] = mapped_column(Float, nullable=False)
@@ -148,5 +178,19 @@ class RouteResult(Base, TimestampMixin):
     safety_score: Mapped[float] = mapped_column(Float, nullable=False)        # 0 - 100
     overall_risk: Mapped[str] = mapped_column(String(50), default="LOW")
     route_geometry: Mapped[dict] = mapped_column(JSON, nullable=False)        # GeoJSON or list of waypoints
+    major_hazards: Mapped[dict] = mapped_column(JSON, default=list)
 
     request: Mapped["RouteRequest"] = relationship("RouteRequest", back_populates="results")
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
+    entity_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    entity_id: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    action: Mapped[str] = mapped_column(String(50), nullable=False)
+    old_data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    new_data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)

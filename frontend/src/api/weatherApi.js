@@ -11,6 +11,7 @@ export const weatherApi = {
       const data = await apiClient.get(`/api/weather?lat=${lat}&lon=${lon}`);
       return { ...data, isFallback: false };
     } catch (err) {
+      console.warn('Backend weather service unavailable, using mock fallback', err);
       return {
         ...MOCK_WEATHER,
         latitude: Number(lat),

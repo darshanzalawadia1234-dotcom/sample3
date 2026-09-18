@@ -11,11 +11,13 @@ from app.ml.iceberg.train import train_iceberg_models
 
 from app.api import (
     health_router,
+    auth_router,
+    vessels_router,
+    ships_router,
     sea_ice_router,
     icebergs_router,
     weather_router,
     ocean_router,
-    ships_router,
     route_router
 )
 
@@ -64,6 +66,7 @@ app = FastAPI(
     description=(
         "AI-Enabled Antarctic Sea-Ice Forecasting, Iceberg Trajectory Prediction, "
         "and Maritime Navigation Decision Support System.\n\n"
+        "**Persistent Source of Truth:** Supabase PostgreSQL + PostGIS.\n"
         "**Official Disclaimer:** This platform is an educational decision-support prototype. "
         "It is not a certified maritime navigation system and must not be used as a substitute "
         "for official navigation charts, ice information, vessel procedures, or qualified maritime personnel."
@@ -73,13 +76,15 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_tags=[
-        {"name": "HEALTH", "description": "System health, database connectivity, and telemetry metrics."},
+        {"name": "HEALTH", "description": "System health, Supabase connectivity, and telemetry metrics."},
+        {"name": "AUTH", "description": "Operator registration, login, session tokens, and profiles."},
+        {"name": "VESSELS", "description": "Persistent polar fleet registry, specs, and telemetry updates."},
+        {"name": "SHIPS", "description": "Backwards-compatible fleet registry alias."},
         {"name": "SEA ICE", "description": "Spatiotemporal sea-ice concentration observations, forecasts, and history."},
         {"name": "ICEBERGS", "description": "Radar-tracked icebergs, Lagrangian drift trajectories, and proximity alerts."},
         {"name": "WEATHER", "description": "Synoptic Antarctic meteorological conditions and wind vectors."},
         {"name": "OCEAN", "description": "Hydrodynamic currents, wave heights, and sea surface temperatures."},
-        {"name": "SHIPS", "description": "Research vessel fleet registry and Polar Class specifications."},
-        {"name": "ROUTING", "description": "Pareto multi-objective route optimization and scenario simulation."}
+        {"name": "ROUTING", "description": "Pareto multi-objective route optimization, comparison, and history."}
     ]
 )
 
@@ -94,11 +99,13 @@ app.add_middleware(
 
 # Mount all API routers
 app.include_router(health_router)
+app.include_router(auth_router)
+app.include_router(vessels_router)
+app.include_router(ships_router)
 app.include_router(sea_ice_router)
 app.include_router(icebergs_router)
 app.include_router(weather_router)
 app.include_router(ocean_router)
-app.include_router(ships_router)
 app.include_router(route_router)
 
 @app.get("/", tags=["HEALTH"], summary="Root system landing")
@@ -115,4 +122,3 @@ async def root():
 async def health_alias():
     from app.api.health import get_health_status
     return await get_health_status()
-

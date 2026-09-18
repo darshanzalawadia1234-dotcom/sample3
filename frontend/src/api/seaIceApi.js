@@ -25,7 +25,6 @@ export const seaIceApi = {
       const data = await apiClient.get(`/api/sea-ice/forecast?horizon=${horizon}`);
       return { ...data, isFallback: false };
     } catch (err) {
-      // Synthesize realistic forecast adjustments based on time horizon
       const multiplier = horizon === '6h' ? 1.01 : horizon === '12h' ? 1.02 : horizon === '48h' ? 1.05 : 1.08;
       const forecastZones = MOCK_SEA_ICE_CURRENT.regionalZones.map(z => ({
         ...z,
@@ -53,14 +52,13 @@ export const seaIceApi = {
       const data = await apiClient.get(`/api/sea-ice/history?lat=${lat}&lon=${lon}&days=${days}`);
       return { ...data, isFallback: false };
     } catch (err) {
-      // Generate synthetic authentic seasonal 30-day polar time series
       const historyPoints = [];
       const now = new Date();
       let currentVal = 68.5;
 
       for (let i = days; i >= 0; i--) {
         const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-        currentVal += (Math.random() * 2.2 - 0.9); // slight upward freezing trend in early season
+        currentVal += (Math.random() * 2.2 - 0.9);
         currentVal = Math.max(10, Math.min(95, currentVal));
         historyPoints.push({
           date: d.toISOString().split('T')[0],
@@ -69,7 +67,6 @@ export const seaIceApi = {
         });
       }
 
-      // Add 3 future prediction points
       const future1 = Number((currentVal + 1.2).toFixed(1));
       const future2 = Number((future1 + 1.8).toFixed(1));
       const future3 = Number((future2 + 2.1).toFixed(1));

@@ -11,6 +11,7 @@ export const oceanApi = {
       const data = await apiClient.get(`/api/ocean?lat=${lat}&lon=${lon}`);
       return { ...data, isFallback: false };
     } catch (err) {
+      console.warn('Backend ocean service unavailable, using mock fallback', err);
       return {
         ...MOCK_OCEAN,
         latitude: Number(lat),

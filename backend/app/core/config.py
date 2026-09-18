@@ -26,9 +26,16 @@ class Settings(BaseSettings):
     DEMO_MODE: bool = True
     SECRET_KEY: str = "polar_decision_support_secret_key_change_in_production"
 
-    # Database
+    # Database & Supabase
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/antarctic_ai"
     SQLITE_FALLBACK_URL: str = f"sqlite:///{BACKEND_DIR / 'antarctic_ai.db'}"
+
+    # Supabase Credentials
+    SUPABASE_URL: str = ""
+    SUPABASE_PUBLISHABLE_KEY: str = ""
+    SUPABASE_SECRET_KEY: str = ""
+    SUPABASE_SERVICE_KEY: str = ""
+    SUPABASE_JWT_SECRET: str = ""
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000"

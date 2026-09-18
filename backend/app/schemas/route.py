@@ -125,6 +125,7 @@ class RouteOptimizeResponse(BaseModel):
     segments: List[RouteSegment]
     proximityAlert: Optional[ProximityAlertResponse] = None
     timeline: List[RouteTimelineMilestone]
+    dbRequestId: Optional[int] = None
 
 class ScenarioSimulateRequest(BaseModel):
     windDelta: float = Field(default=0.0, description="Wind speed offset in knots")
