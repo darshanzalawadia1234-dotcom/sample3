@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import MapContainer from '../components/map/MapContainer';
 import { useRoute } from '../hooks/useRoute';
 import { useShips } from '../hooks/useShips';
-import { Play, RotateCcw, ShieldCheck, Check } from 'lucide-react';
+import { Play, RotateCcw, ShieldCheck, Check, Compass, Info, ArrowRight } from 'lucide-react';
+import { MOCK_ROUTES } from '../api/mockData';
 
 export default function Navigation() {
   const { ships } = useShips();
@@ -44,13 +45,13 @@ export default function Navigation() {
         <h1 className="page-title-serif">ROUTE PLANNING</h1>
       </div>
 
-      {/* Main Layout: Left Controls + Right Map */}
+      {/* Top Split: Left Parameters + Right Map */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '320px 1fr',
+          gridTemplateColumns: '340px 1fr',
           gap: '16px',
-          height: '370px'
+          alignItems: 'stretch'
         }}
         className="nav-split-grid"
       >
@@ -63,9 +64,7 @@ export default function Navigation() {
             padding: '16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '10px',
-            height: '370px',
-            overflowY: 'auto'
+            gap: '12px'
           }}
         >
           <div className="technical-label">OPTIMIZATION PARAMETERS</div>
@@ -164,7 +163,8 @@ export default function Navigation() {
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            height: '370px'
+            minHeight: '380px',
+            height: '100%'
           }}
         >
           <MapContainer
@@ -240,9 +240,115 @@ export default function Navigation() {
         </table>
       </div>
 
+      {/* Section 16: AI DECISION EXPLANATION & TRADEOFF ANALYSIS */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1.2fr 1fr',
+          gap: '16px'
+        }}
+        className="nav-decision-grid"
+      >
+        <div
+          style={{
+            backgroundColor: '#121512',
+            border: '1px solid #292D28',
+            borderRadius: 'var(--radius-sm)',
+            padding: '18px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <Compass size={16} color="#C8D35A" />
+            <span className="technical-label">AI ROUTE SELECTION RATIONALE</span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {MOCK_ROUTES.decisionExplanation.highlights.map((h, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: '#E8E6D9' }}>
+                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
+                <span>{h}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            backgroundColor: '#121512',
+            border: '1px solid #292D28',
+            borderRadius: 'var(--radius-sm)',
+            padding: '18px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <Info size={16} color="#C8D35A" />
+            <span className="technical-label">MULTI-OBJECTIVE TRADEOFF</span>
+          </div>
+
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', color: '#9A9D93', lineHeight: 1.6 }}>
+            {MOCK_ROUTES.decisionExplanation.tradeoff}
+          </p>
+        </div>
+      </div>
+
+      {/* Section 17: SEGMENT-BY-SEGMENT WAYPOINT INSPECTION */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '18px'
+        }}
+      >
+        <div className="technical-label" style={{ marginBottom: '14px' }}>
+          WAYPOINT CORRIDOR SEGMENTS ({MOCK_ROUTES.segments.length})
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+          {MOCK_ROUTES.segments.map((seg) => (
+            <div
+              key={seg.id}
+              style={{
+                backgroundColor: '#0B0D0C',
+                border: '1px solid #222621',
+                borderRadius: '2px',
+                padding: '14px'
+              }}
+            >
+              <div className="flex-between" style={{ marginBottom: '6px' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: '#C8D35A' }}>
+                  {seg.id}
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '9px',
+                    fontWeight: 600,
+                    color: seg.icebergRisk === 'LOW' ? '#4EBA6F' : '#E09F3E'
+                  }}
+                >
+                  RISK: {seg.icebergRisk}
+                </span>
+              </div>
+
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#E8E6D9', fontWeight: 600, marginBottom: '8px' }}>
+                {seg.title}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#9A9D93' }}>
+                <div>DIST: {seg.distanceKm} km</div>
+                <div>ICE CONC: {seg.seaIceConcentration}%</div>
+                <div>WIND: {seg.windSpeedKnots} kn</div>
+                <div>FUEL: {seg.fuelEstimateLiters} L</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <style>{`
         @media (max-width: 960px) {
-          .nav-split-grid {
+          .nav-split-grid, .nav-decision-grid {
             grid-template-columns: 1fr !important;
           }
         }

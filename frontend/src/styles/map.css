@@ -19,7 +19,7 @@
 
 /* Dark Scientific Tile Filter */
 .leaflet-tile {
-  filter: brightness(0.65) contrast(1.25) saturate(0.2) hue-rotate(85deg);
+  filter: brightness(0.9) contrast(1.1) saturate(0.5) hue-rotate(60deg);
 }
 
 /* Minimal Scientific Map Controls (+ / - / Layers) */

@@ -54,10 +54,9 @@ export default function MapContainer({
       preferCanvas: true // Fast HTML5 Canvas vector rendering
     });
 
-    // Dark cartographic ocean basemap
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CARTO | GEBCO Bathymetry',
-      subdomains: 'abcd',
+    // High-performance dark polar cartography basemap (100% free, no API key watermark)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; Esri &mdash; Polar Cartographic Bathymetry',
       maxZoom: 8,
       keepBuffer: 2
     }).addTo(map);

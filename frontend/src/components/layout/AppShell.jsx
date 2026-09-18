@@ -11,7 +11,7 @@ export default function AppShell() {
   const [shaderEnabled, setShaderEnabled] = useState(true);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'transparent', position: 'relative' }}>
+    <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: 'transparent', position: 'relative', overflow: 'hidden' }}>
       {/* Ambient WebGL Simplex Noise Polar Abyss Shader */}
       {shaderEnabled && <PolarShaderBackground opacity={0.75} />}
       {/* Persistent Left Sidebar */}
@@ -28,6 +28,7 @@ export default function AppShell() {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
+          height: '100vh',
           minWidth: 0,
           marginLeft: collapsed ? 'var(--sidebar-collapsed-width)' : 'var(--sidebar-width)',
           transition: 'margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1)'

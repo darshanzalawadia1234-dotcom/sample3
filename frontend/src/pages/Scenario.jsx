@@ -38,9 +38,9 @@ export default function Scenario() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '340px 1fr',
+          gridTemplateColumns: '360px 1fr',
           gap: '18px',
-          height: '350px'
+          alignItems: 'stretch'
         }}
         className="scenario-split-grid"
       >
@@ -53,9 +53,7 @@ export default function Scenario() {
             padding: '18px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
-            height: '350px',
-            overflowY: 'auto'
+            gap: '12px'
           }}
         >
           <div className="technical-label">SCENARIO INPUT PARAMETERS</div>
@@ -157,7 +155,8 @@ export default function Scenario() {
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            height: '350px'
+            minHeight: '380px',
+            height: '100%'
           }}
         >
           <MapContainer />

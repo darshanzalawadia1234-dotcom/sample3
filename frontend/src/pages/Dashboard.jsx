@@ -90,12 +90,10 @@ export default function Dashboard() {
         <div
           style={{
             backgroundColor: '#0D100E',
-            padding: '18px',
-            overflowY: 'auto',
-            height: '420px',
+            padding: '16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
+            gap: '12px',
             borderBottom: '1px solid #292D28'
           }}
           className="dashboard-side-panel"
@@ -106,10 +104,10 @@ export default function Dashboard() {
               backgroundColor: '#121512',
               border: '1px solid #292D28',
               borderRadius: 'var(--radius-sm)',
-              padding: '14px'
+              padding: '12px'
             }}
           >
-            <div className="flex-between" style={{ marginBottom: '8px' }}>
+            <div className="flex-between" style={{ marginBottom: '6px' }}>
               <span className="technical-label">HAZARD STATE</span>
               <span
                 style={{
@@ -127,14 +125,14 @@ export default function Dashboard() {
               </span>
             </div>
 
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', color: '#E8E6D9', lineHeight: 1.5, margin: '6px 0 12px 0' }}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#E8E6D9', lineHeight: 1.4, margin: '4px 0 10px 0' }}>
               <strong style={{ color: '#E8E6D9' }}>A-017</strong> projected within 18.4 km of route in 14h 20m.
             </p>
 
             <button
               onClick={handleInspectHazard}
               className="btn-secondary"
-              style={{ width: '100%', fontSize: '11.5px', padding: '6px 12px' }}
+              style={{ width: '100%', fontSize: '11px', padding: '5px 10px' }}
             >
               View on map
             </button>
@@ -146,10 +144,10 @@ export default function Dashboard() {
               backgroundColor: '#121512',
               border: '1px solid #292D28',
               borderRadius: 'var(--radius-sm)',
-              padding: '14px'
+              padding: '12px'
             }}
           >
-            <div className="flex-between" style={{ marginBottom: '8px' }}>
+            <div className="flex-between" style={{ marginBottom: '6px' }}>
               <span className="technical-label">RECOMMENDED ACTION</span>
               <span
                 style={{
@@ -166,12 +164,12 @@ export default function Dashboard() {
               </span>
             </div>
 
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 600, color: '#E8E6D9', marginBottom: '6px' }}>
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', fontWeight: 600, color: '#E8E6D9', marginBottom: '4px' }}>
               Maintain eastern corridor
             </div>
 
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#9A9D93', lineHeight: 1.5 }}>
-              Avoid the compacting ice edge west of waypoint 04. Reassess at +12 hours.
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11.5px', color: '#9A9D93', lineHeight: 1.4 }}>
+              Avoid compacting ice edge west of waypoint 04. Reassess at +12h.
             </p>
           </div>
 
@@ -181,84 +179,84 @@ export default function Dashboard() {
               backgroundColor: '#121512',
               border: '1px solid #292D28',
               borderRadius: 'var(--radius-sm)',
-              padding: '14px'
+              padding: '12px'
             }}
           >
-            <div className="technical-label" style={{ marginBottom: '8px' }}>
+            <div className="technical-label" style={{ marginBottom: '6px' }}>
               ROUTE DECISION
             </div>
 
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#9A9D93', marginBottom: '10px' }}>
-              Why this route?
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11.5px', color: '#E8E6D9' }}>
-                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#E8E6D9' }}>
+                <Check size={13} color="#C8D35A" style={{ flexShrink: 0 }} />
                 <span>Lower iceberg exposure</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11.5px', color: '#E8E6D9' }}>
-                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
-                <span>Avoids dense sea ice</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#E8E6D9' }}>
+                <Check size={13} color="#C8D35A" style={{ flexShrink: 0 }} />
+                <span>Avoids dense pack ice</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11.5px', color: '#E8E6D9' }}>
-                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
-                <span>Acceptable additional travel time</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#E8E6D9' }}>
+                <Check size={13} color="#C8D35A" style={{ flexShrink: 0 }} />
+                <span>Optimal fuel & time compromise</span>
               </div>
             </div>
 
             <button
               onClick={() => navigate('/navigation')}
               className="btn-primary-action"
-              style={{ width: '100%', marginTop: '14px', fontSize: '11.5px', padding: '7px 12px' }}
+              style={{ width: '100%', fontSize: '11px', padding: '6px 10px' }}
             >
               <span>Inspect Profile & Waypoints</span>
-              <ArrowRight size={13} />
+              <ArrowRight size={12} />
             </button>
           </div>
+        </div>
+      </div>
 
-          {/* Environmental Observations Panel (Section 9) */}
-          <div
-            style={{
-              backgroundColor: '#121512',
-              border: '1px solid #292D28',
-              borderRadius: 'var(--radius-sm)',
-              padding: '14px'
-            }}
-          >
-            <div className="technical-label" style={{ marginBottom: '10px' }}>
-              IN-SITU OBSERVATIONS
+      {/* Section 14: IN-SITU OBSERVATIONS FULL DECK */}
+      <div
+        style={{
+          backgroundColor: '#0D100E',
+          borderBottom: '1px solid #292D28',
+          padding: '12px 24px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span className="technical-label">IN-SITU METOCEAN OBSERVATIONS · WMO BUOY NETWORK</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: '#6F746C' }}>LIVE SENSOR FEEDS</span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+          <div style={{ backgroundColor: '#121512', border: '1px solid #222621', padding: '10px 14px', borderRadius: '2px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>AIR TEMPERATURE</div>
+            <div style={{ color: '#E8E6D9', fontSize: '15px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+              -18.4 °C
             </div>
+            <div style={{ color: '#9A9D93', fontSize: '9px', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>Trend: Steady (-0.2°C/h)</div>
+          </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
-                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>AIR TEMP</div>
-                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
-                  -18.4 °C
-                </div>
-              </div>
-
-              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
-                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>WIND</div>
-                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
-                  SW 18.2 kn
-                </div>
-              </div>
-
-              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
-                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>PRESSURE</div>
-                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
-                  978 hPa
-                </div>
-              </div>
-
-              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
-                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>WAVES</div>
-                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
-                  2.1 m
-                </div>
-              </div>
+          <div style={{ backgroundColor: '#121512', border: '1px solid #222621', padding: '10px 14px', borderRadius: '2px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>SURFACE WIND</div>
+            <div style={{ color: '#E8E6D9', fontSize: '15px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+              SW 18.2 kn
             </div>
+            <div style={{ color: '#9A9D93', fontSize: '9px', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>Gusts: 28.5 kn</div>
+          </div>
+
+          <div style={{ backgroundColor: '#121512', border: '1px solid #222621', padding: '10px 14px', borderRadius: '2px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>BAROMETRIC PRESSURE</div>
+            <div style={{ color: '#E8E6D9', fontSize: '15px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+              978.5 hPa
+            </div>
+            <div style={{ color: '#C8D35A', fontSize: '9px', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>Falling (-1.2 hPa/3h)</div>
+          </div>
+
+          <div style={{ backgroundColor: '#121512', border: '1px solid #222621', padding: '10px 14px', borderRadius: '2px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>SIGNIFICANT WAVE HEIGHT</div>
+            <div style={{ color: '#E8E6D9', fontSize: '15px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+              2.1 m
+            </div>
+            <div style={{ color: '#9A9D93', fontSize: '9px', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>Period: 8.5s · Sea State 4</div>
           </div>
         </div>
       </div>

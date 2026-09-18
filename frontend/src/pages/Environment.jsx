@@ -21,9 +21,9 @@ export default function Environment() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 340px',
+          gridTemplateColumns: '1fr 360px',
           gap: '18px',
-          height: '350px'
+          alignItems: 'stretch'
         }}
         className="env-split-grid"
       >
@@ -34,7 +34,8 @@ export default function Environment() {
             border: '1px solid #292D28',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            height: '350px'
+            minHeight: '380px',
+            height: '100%'
           }}
         >
           <MapContainer />
@@ -49,9 +50,7 @@ export default function Environment() {
             padding: '18px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
-            height: '350px',
-            overflowY: 'auto'
+            gap: '12px'
           }}
         >
           <div className="technical-label">CURRENT CONDITIONS</div>
