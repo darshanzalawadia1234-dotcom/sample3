@@ -16,10 +16,8 @@ export default function OperationsStrip() {
     <div
       style={{
         height: 'var(--strip-height)',
-        backgroundColor: 'rgba(4, 19, 44, 0.45)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        borderBottom: '1px solid var(--glass-border-subtle)',
+        backgroundColor: '#0E1210',
+        borderBottom: '1px solid #292D28',
         display: 'flex',
         alignItems: 'center',
         padding: '0 20px',

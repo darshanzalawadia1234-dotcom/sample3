@@ -2,388 +2,389 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useShips } from '../hooks/useShips';
 import { useApp } from '../context/AppContext';
-import { formatFuel } from '../utils/formatting';
 import { formatLatitude, formatLongitude } from '../utils/coordinates';
-import { validateVesselForm } from '../utils/validation';
-import CoordinateDisplay from '../components/common/CoordinateDisplay';
-import { Ship, Plus, Edit2, Trash2, Navigation, Check, X, ShieldAlert } from 'lucide-react';
+import { Ship, Plus, Trash2, ArrowRight, X, Check } from 'lucide-react';
 
 export default function Vessels() {
   const navigate = useNavigate();
-  const { ships, loading, addShip, editShip, removeShip } = useShips();
+  const { ships, addShip, editShip, removeShip } = useShips();
   const { selectShipForNavigation } = useApp();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
 
   const initialForm = {
     name: '',
-    latitude: -64.82,
-    longitude: -58.25,
-    maxSpeed: 15.0,
-    normalSpeed: 11.0,
-    fuelCapacity: 900000,
-    fuelConsumptionRate: 85,
-    iceClass: 'PC3 (Polar Class 3)',
-    destination: 'Rothera Research Station',
-    destLatitude: -67.57,
-    destLongitude: -68.13,
-    operator: 'National Polar Research Institute'
+    vesselType: 'Polar Research Icebreaker',
+    imo: '',
+    callsign: '',
+    latitude: -64.52,
+    longitude: 41.31,
+    normalSpeed: 14.2,
+    heading: 214,
+    iceClass: 'PC 5',
+    fuelCapacity: 950000,
+    currentFuel: 820000,
+    destination: 'Mawson Research Station',
+    status: 'ACTIVE'
   };
 
   const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState({});
 
   const handleOpenAdd = () => {
     setEditingId(null);
     setForm(initialForm);
-    setErrors({});
-    setModalOpen(true);
-  };
-
-  const handleOpenEdit = (vessel) => {
-    setEditingId(vessel.id);
-    setForm({
-      name: vessel.name,
-      latitude: vessel.latitude,
-      longitude: vessel.longitude,
-      maxSpeed: vessel.maxSpeed,
-      normalSpeed: vessel.normalSpeed,
-      fuelCapacity: vessel.fuelCapacity,
-      fuelConsumptionRate: vessel.fuelConsumptionRate,
-      iceClass: vessel.iceClass,
-      destination: vessel.destination,
-      destLatitude: vessel.destLatitude || -67.57,
-      destLongitude: vessel.destLongitude || -68.13,
-      operator: vessel.operator || 'Antarctic Expedition'
-    });
-    setErrors({});
     setModalOpen(true);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const validation = validateVesselForm(form);
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
     try {
       if (editingId) {
         await editShip(editingId, {
           ...form,
           latitude: Number(form.latitude),
           longitude: Number(form.longitude),
-          maxSpeed: Number(form.maxSpeed),
           normalSpeed: Number(form.normalSpeed),
+          heading: Number(form.heading),
           fuelCapacity: Number(form.fuelCapacity),
-          fuelConsumptionRate: Number(form.fuelConsumptionRate),
-          destLatitude: Number(form.destLatitude),
-          destLongitude: Number(form.destLongitude)
+          currentFuel: Number(form.currentFuel)
         });
       } else {
         await addShip({
           ...form,
+          id: `ship_${Date.now()}`,
           latitude: Number(form.latitude),
           longitude: Number(form.longitude),
-          maxSpeed: Number(form.maxSpeed),
           normalSpeed: Number(form.normalSpeed),
+          heading: Number(form.heading),
           fuelCapacity: Number(form.fuelCapacity),
-          fuelConsumptionRate: Number(form.fuelConsumptionRate),
-          destLatitude: Number(form.destLatitude),
-          destLongitude: Number(form.destLongitude)
+          currentFuel: Number(form.currentFuel)
         });
       }
+
       setModalOpen(false);
+      setToastMessage(`VESSEL UPDATED · ${form.name.toUpperCase()} · DATA SAVED`);
+      setTimeout(() => setToastMessage(''), 4000);
     } catch (err) {
-      alert(err.message || 'Failed to persist vessel');
+      console.error('Error saving vessel', err);
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (confirm(`Remove research vessel "${name}" from polar fleet registry?`)) {
+  const handleDelete = async (e, id, name) => {
+    e.stopPropagation();
+    if (window.confirm(`Remove ${name} from active fleet registry?`)) {
       await removeShip(id);
+      setToastMessage(`VESSEL REMOVED · ${name.toUpperCase()}`);
+      setTimeout(() => setToastMessage(''), 3000);
     }
-  };
-
-  const handlePlanRoute = (vessel) => {
-    selectShipForNavigation(vessel);
-    navigate('/navigation');
   };
 
   return (
-    <div style={{ flex: 1, padding: '20px 28px', backgroundColor: 'transparent', overflowY: 'auto' }}>
-      {/* Header */}
-      <div className="flex-between" style={{ marginBottom: '20px' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+      {/* Toast Confirmation */}
+      {toastMessage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '64px',
+            right: '28px',
+            zIndex: 2000,
+            backgroundColor: '#121512',
+            border: '1px solid #C8D35A',
+            color: '#C8D35A',
+            padding: '10px 16px',
+            borderRadius: '2px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.6)'
+          }}
+        >
+          <Check size={14} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header matching Section 17 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
         <div>
-          <div className="technical-label">MARITIME ASSET DIRECTORY</div>
-          <h2 className="mono-readout" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-            REGISTERED ANTARCTIC RESEARCH FLEET
-          </h2>
+          <div className="page-eyebrow">FLEET REGISTRY · {ships.length} ACTIVE</div>
+          <h1 className="page-title-serif" style={{ fontSize: '32px' }}>Expedition fleet</h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+            Registered vessel particulars, current fixes, fuel profiles, and destinations.
+          </p>
         </div>
 
-        <button onClick={handleOpenAdd} className="btn-polar btn-primary-action">
+        <button onClick={handleOpenAdd} className="btn-primary-action">
           <Plus size={14} />
-          <span>Register New Vessel</span>
+          <span>Add vessel</span>
         </button>
       </div>
 
-      {/* Vessels Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '16px' }}>
-        {ships.map(ship => (
-          <div key={ship.id} className="tech-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div className="flex-between">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* Section 17: Vertical List of Vessels with Subtle Borders and Generous Spacing */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {ships.map((ship) => {
+          const latStr = formatLatitude(ship.latitude);
+          const lonStr = formatLongitude(ship.longitude);
+
+          return (
+            <div
+              key={ship.id}
+              style={{
+                backgroundColor: '#121512',
+                border: '1px solid #292D28',
+                borderRadius: 'var(--radius-sm)',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '16px',
+                flexWrap: 'wrap',
+                transition: 'border-color 0.15s ease'
+              }}
+            >
+              {/* Left Column: Vessel Identity */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: '240px' }}>
                 <div
                   style={{
-                    width: '28px',
-                    height: '28px',
-                    border: '1px solid var(--accent-cyan)',
+                    width: '34px',
+                    height: '34px',
+                    backgroundColor: '#0B0D0C',
+                    border: '1px solid #292D28',
                     borderRadius: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'rgba(91, 192, 190, 0.1)'
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: '#C8D35A'
                   }}
                 >
-                  <Ship size={15} color="var(--accent-cyan)" />
+                  <Ship size={16} />
                 </div>
+
                 <div>
-                  <Link
-                    to={`/vessels/${ship.id}`}
-                    className="mono-readout"
-                    style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', textDecoration: 'none' }}
-                  >
-                    {ship.name}
-                  </Link>
-                  <div className="technical-label" style={{ fontSize: '9px', color: 'var(--accent-ice)' }}>
-                    {ship.iceClass}
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: '#6F746C', letterSpacing: '0.12em' }}>
+                    RESEARCH VESSEL
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, color: '#E8E6D9', marginTop: '2px' }}>
+                    {ship.name.toUpperCase()}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#9A9D93', marginTop: '2px' }}>
+                    {latStr} · {lonStr}
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '4px' }}>
-                <button
-                  onClick={() => handleOpenEdit(ship)}
-                  className="btn-polar"
-                  style={{ padding: '4px', border: '1px solid var(--border-subtle)' }}
-                  title="Edit Vessel Parameters"
+              {/* Middle Column: Speed & Ice Class */}
+              <div style={{ display: 'flex', gap: '32px', fontFamily: 'var(--font-mono)' }}>
+                <div>
+                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>SPEED</div>
+                  <div style={{ color: '#E8E6D9', fontSize: '13px', fontWeight: 500, marginTop: '2px' }}>
+                    {ship.normalSpeed || 14.2} kn
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>ICE CLASS</div>
+                  <div style={{ color: '#C8D35A', fontSize: '13px', fontWeight: 500, marginTop: '2px' }}>
+                    {ship.iceClass || 'PC 5'}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>DESTINATION</div>
+                  <div style={{ color: '#9A9D93', fontSize: '13px', marginTop: '2px' }}>
+                    {ship.destination || 'Rothera Station'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Actions */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Link
+                  to={`/vessels/${ship.id}`}
+                  className="btn-secondary"
+                  style={{ textDecoration: 'none', fontSize: '11px', padding: '6px 12px' }}
                 >
-                  <Edit2 size={13} />
-                </button>
+                  <span>Open record</span>
+                  <ArrowRight size={12} />
+                </Link>
+
                 <button
-                  onClick={() => handleDelete(ship.id, ship.name)}
-                  className="btn-polar btn-danger-action"
-                  style={{ padding: '4px' }}
-                  title="Remove from Registry"
+                  onClick={(e) => handleDelete(e, ship.id, ship.name)}
+                  style={{
+                    background: 'none',
+                    border: '1px solid #292D28',
+                    color: '#6F746C',
+                    padding: '6px 8px',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                  title="Remove vessel"
                 >
                   <Trash2 size={13} />
                 </button>
               </div>
             </div>
-
-            {/* Position and Destination */}
-            <div style={{ background: 'var(--bg-primary)', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-              <div className="flex-between">
-                <span style={{ color: 'var(--text-muted)' }}>CURRENT POSITION:</span>
-                <span style={{ color: 'var(--text-primary)' }}>
-                  {formatLatitude(ship.latitude)} {formatLongitude(ship.longitude)}
-                </span>
-              </div>
-              <div className="flex-between">
-                <span style={{ color: 'var(--text-muted)' }}>ASSIGNED DESTINATION:</span>
-                <span style={{ color: 'var(--accent-ice)' }}>{ship.destination}</span>
-              </div>
-            </div>
-
-            {/* Vessel Engineering Metrics */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', fontSize: '10.5px', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ background: 'var(--bg-primary)', padding: '6px 8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '8.5px', display: 'block' }}>CRUISING SPEED</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{ship.normalSpeed} kn</span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '6px 8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '8.5px', display: 'block' }}>FUEL CAPACITY</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{formatFuel(ship.fuelCapacity, 't')}</span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '6px 8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '8.5px', display: 'block' }}>BURN RATE</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{ship.fuelConsumptionRate} L/nm</span>
-              </div>
-            </div>
-
-            {/* Plan Route CTA */}
-            <button
-              onClick={() => handlePlanRoute(ship)}
-              className="btn-polar btn-primary-action"
-              style={{ width: '100%', marginTop: '4px', padding: '8px' }}
-            >
-              <Navigation size={13} />
-              <span>Plan Route for this Vessel</span>
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Add / Edit Vessel Modal */}
+      {/* Section 18: ADD / EDIT VESSEL MODAL */}
       {modalOpen && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(5, 10, 18, 0.8)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 3000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            backgroundColor: 'rgba(11, 13, 12, 0.85)',
+            zIndex: 1500,
+            display: 'grid',
+            placeItems: 'center',
             padding: '20px'
           }}
         >
           <div
-            className="tech-card"
             style={{
-              width: '560px',
-              maxWidth: '100%',
-              backgroundColor: 'var(--surface-overlay)',
-              border: '1px solid var(--border-medium)',
-              boxShadow: 'var(--shadow-overlay)',
-              padding: '20px',
+              backgroundColor: '#121512',
+              border: '1px solid #292D28',
+              borderRadius: 'var(--radius-sm)',
+              width: '100%',
+              maxWidth: '560px',
+              padding: '24px',
               maxHeight: '90vh',
               overflowY: 'auto'
             }}
           >
-            <div className="flex-between" style={{ marginBottom: '14px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '10px' }}>
-              <div className="mono-readout" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                {editingId ? 'EDIT VESSEL SPECIFICATIONS' : 'REGISTER NEW RESEARCH VESSEL'}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #292D28', paddingBottom: '12px', marginBottom: '18px' }}>
+              <div>
+                <div className="technical-label">FLEET REGISTRATION</div>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: '#E8E6D9', marginTop: '2px' }}>
+                  {editingId ? 'Edit Vessel' : 'Add Vessel'}
+                </div>
               </div>
-              <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                <X size={16} />
+              <button
+                onClick={() => setModalOpen(false)}
+                style={{ background: 'none', border: 'none', color: '#6F746C', cursor: 'pointer' }}
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Vessel Name</label>
+                <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>VESSEL NAME</label>
                 <input
                   type="text"
+                  required
                   value={form.name}
-                  onChange={e => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. R/V Polarstern"
-                  className="input-polar"
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="e.g. RV Meridian"
                 />
-                {errors.name && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.name}</div>}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Latitude (-90 to +90)</label>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>IMO / IDENTIFIER</label>
                   <input
-                    type="number"
-                    step="0.0001"
+                    type="text"
+                    value={form.imo}
+                    onChange={(e) => setForm({ ...form, imo: e.target.value })}
+                    placeholder="9798222"
+                  />
+                </div>
+                <div>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>CALL SIGN</label>
+                  <input
+                    type="text"
+                    value={form.callsign}
+                    onChange={(e) => setForm({ ...form, callsign: e.target.value })}
+                    placeholder="ZDLP"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>LATITUDE</label>
+                  <input
+                    type="text"
                     value={form.latitude}
-                    onChange={e => setForm({ ...form, latitude: e.target.value })}
-                    className="input-polar"
+                    onChange={(e) => setForm({ ...form, latitude: e.target.value })}
                   />
-                  {errors.latitude && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.latitude}</div>}
                 </div>
                 <div>
-                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Longitude (-180 to +180)</label>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>LONGITUDE</label>
                   <input
-                    type="number"
-                    step="0.0001"
+                    type="text"
                     value={form.longitude}
-                    onChange={e => setForm({ ...form, longitude: e.target.value })}
-                    className="input-polar"
+                    onChange={(e) => setForm({ ...form, longitude: e.target.value })}
                   />
-                  {errors.longitude && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.longitude}</div>}
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Maximum Speed (kn)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={form.maxSpeed}
-                    onChange={e => setForm({ ...form, maxSpeed: e.target.value })}
-                    className="input-polar"
-                  />
-                  {errors.maxSpeed && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.maxSpeed}</div>}
-                </div>
-                <div>
-                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Cruising Speed (kn)</label>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>SPEED (kn)</label>
                   <input
                     type="number"
                     step="0.1"
                     value={form.normalSpeed}
-                    onChange={e => setForm({ ...form, normalSpeed: e.target.value })}
-                    className="input-polar"
+                    onChange={(e) => setForm({ ...form, normalSpeed: e.target.value })}
                   />
-                  {errors.normalSpeed && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.normalSpeed}</div>}
+                </div>
+                <div>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>HEADING (°)</label>
+                  <input
+                    type="number"
+                    value={form.heading}
+                    onChange={(e) => setForm({ ...form, heading: e.target.value })}
+                  />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Bunker Fuel Capacity (L)</label>
-                  <input
-                    type="number"
-                    value={form.fuelCapacity}
-                    onChange={e => setForm({ ...form, fuelCapacity: e.target.value })}
-                    className="input-polar"
-                  />
-                  {errors.fuelCapacity && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.fuelCapacity}</div>}
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>ICE CLASS</label>
+                  <select
+                    value={form.iceClass}
+                    onChange={(e) => setForm({ ...form, iceClass: e.target.value })}
+                  >
+                    <option value="PC 1">PC 1 (Year-round polar ice)</option>
+                    <option value="PC 2">PC 2 (Multi-year ice)</option>
+                    <option value="PC 3">PC 3 (Second-year ice)</option>
+                    <option value="PC 4">PC 4 (Thick first-year ice)</option>
+                    <option value="PC 5">PC 5 (Medium first-year)</option>
+                    <option value="PC 6">PC 6 (Thin first-year)</option>
+                    <option value="PC 7">PC 7 (Summer thin first-year)</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Fuel Consumption Rate (L/nm)</label>
+                  <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>DESTINATION</label>
                   <input
-                    type="number"
-                    step="0.1"
-                    value={form.fuelConsumptionRate}
-                    onChange={e => setForm({ ...form, fuelConsumptionRate: e.target.value })}
-                    className="input-polar"
+                    type="text"
+                    value={form.destination}
+                    onChange={(e) => setForm({ ...form, destination: e.target.value })}
                   />
-                  {errors.fuelConsumptionRate && <div style={{ color: 'var(--risk-high)', fontSize: '10px', marginTop: '2px' }}>{errors.fuelConsumptionRate}</div>}
                 </div>
               </div>
 
-              <div>
-                <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>IMO Polar Class Rating</label>
-                <select
-                  value={form.iceClass}
-                  onChange={e => setForm({ ...form, iceClass: e.target.value })}
-                  className="input-polar"
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="btn-secondary"
                 >
-                  <option value="PC1 (Year-round polar operation in all ice conditions)">PC1 - Year-round all polar ice</option>
-                  <option value="PC2 (Year-round moderate multi-year ice conditions)">PC2 - Moderate multi-year ice</option>
-                  <option value="PC3 (Year-round second-year ice with multi-year inclusions)">PC3 - Second-year ice / multi-year inclusions</option>
-                  <option value="PC4 (Year-round thick first-year ice)">PC4 - Thick first-year ice</option>
-                  <option value="PC5 (Year-round medium first-year ice)">PC5 - Medium first-year ice</option>
-                  <option value="PC6 (Summer/autumn medium first-year ice)">PC6 - Summer/autumn first-year ice</option>
-                  <option value="PC7 (Summer/autumn thin first-year ice)">PC7 - Thin first-year ice</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Destination Name</label>
-                <input
-                  type="text"
-                  value={form.destination}
-                  onChange={e => setForm({ ...form, destination: e.target.value })}
-                  className="input-polar"
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
-                <button type="button" onClick={() => setModalOpen(false)} className="btn-polar">
                   Cancel
                 </button>
-                <button type="submit" className="btn-polar btn-primary-action">
-                  <Check size={14} />
-                  <span>{editingId ? 'Save Modifications' : 'Register Vessel'}</span>
+                <button
+                  type="submit"
+                  className="btn-primary-action"
+                >
+                  Save vessel
                 </button>
               </div>
             </form>

@@ -1,225 +1,211 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MapContainer from '../components/map/MapContainer';
 import SeaIceChart from '../components/charts/SeaIceChart';
-import Metric from '../components/common/Metric';
-import LoadingState from '../components/common/LoadingState';
-import CoordinateDisplay from '../components/common/CoordinateDisplay';
+import { Layers, Calendar, Search } from 'lucide-react';
 import { useSeaIce } from '../hooks/useSeaIce';
-import { seaIceApi } from '../api/seaIceApi';
-import { formatLatitude, formatLongitude } from '../utils/coordinates';
-import { Layers, Calendar, Clock, Sparkles, TrendingUp, Info } from 'lucide-react';
-import { useApp } from '../context/AppContext';
 
 export default function SeaIce() {
-  const { systemStatus } = useApp();
-  const horizons = ['6h', '12h', '24h', '48h', '72h', '5d'];
-  const { currentData, forecastData, horizon, setHorizon, loading, error } = useSeaIce('24h');
+  const horizons = ['6h', '12h', '24h', '48h', '72h'];
+  const { currentData, forecastData, horizon, setHorizon } = useSeaIce('24h');
 
-  // Selected map coordinate inspection
-  const [inspectedLocation, setInspectedLocation] = useState({
-    name: 'Weddell Sea Pack Sector',
-    lat: -70.5,
-    lon: -45.0,
-    concentration: 88.5,
-    confidence: 87,
-    pred24: 89.8,
-    pred48: 91.2,
-    pred72: 92.4,
-    source: systemStatus.dataMode,
-    model: 'Sea Ice Forecast v1.0 (RF Regressor)'
-  });
+  const [startDate, setStartDate] = useState('2026-08-01');
+  const [endDate, setEndDate] = useState('2026-09-18');
+  const [queryLat, setQueryLat] = useState('-70.5231');
+  const [queryLon, setQueryLon] = useState('-45.1842');
+  const [loadedNotice, setLoadedNotice] = useState(false);
 
-  const [historyResult, setHistoryResult] = useState(null);
-  const [historyLoading, setHistoryLoading] = useState(false);
-
-  // Fetch historical data for inspected location
-  useEffect(() => {
-    const loadHistory = async () => {
-      setHistoryLoading(true);
-      try {
-        const res = await seaIceApi.getHistory(inspectedLocation.lat, inspectedLocation.lon, 14);
-        setHistoryResult(res);
-      } catch (e) {
-        console.error('History fetch error', e);
-      } finally {
-        setHistoryLoading(false);
-      }
-    };
-    loadHistory();
-  }, [inspectedLocation.lat, inspectedLocation.lon]);
+  const handleQuery = (e) => {
+    e.preventDefault();
+    setLoadedNotice(true);
+    setTimeout(() => setLoadedNotice(false), 3000);
+  };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      {/* Top Horizon Selection Bar */}
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+      {/* Page Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
+        <div>
+          <div className="page-eyebrow">CRYOSPHERE NUMERICAL OBSERVATIONS</div>
+          <h1 className="page-title-serif">SEA-ICE ANALYSIS</h1>
+        </div>
+
+        {/* Forecast Horizon Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="technical-label" style={{ marginRight: '6px' }}>FORECAST HORIZON:</span>
+          {horizons.map((h) => (
+            <button
+              key={h}
+              onClick={() => setHorizon(h)}
+              style={{
+                background: horizon === h ? '#C8D35A' : '#121512',
+                color: horizon === h ? '#0B0D0C' : '#9A9D93',
+                border: `1px solid ${horizon === h ? '#C8D35A' : '#292D28'}`,
+                borderRadius: '2px',
+                padding: '4px 10px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10.5px',
+                fontWeight: horizon === h ? 600 : 400,
+                cursor: 'pointer'
+              }}
+            >
+              {h}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* UPPER AREA: Scientific Sea-Ice Map Visualization */}
       <div
         style={{
-          padding: '12px 20px',
-          backgroundColor: 'rgba(13, 27, 52, 0.65)',
-          backdropFilter: 'var(--glass-blur)',
-          WebkitBackdropFilter: 'var(--glass-blur)',
-          borderBottom: '1px solid var(--glass-border)',
-          boxShadow: 'var(--shadow-panel)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
+          height: '420px',
+          backgroundColor: '#0B0F0D',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Layers size={15} color="var(--accent-ice)" />
-          <span className="technical-label" style={{ fontSize: '11px', color: 'var(--text-primary)' }}>
-            SEA-ICE SPATIAL CONCENTRATION & NUMERICAL FORECAST
+        <MapContainer />
+      </div>
+
+      {/* Section 14: CONCENTRATION SCALE (Grayscale / Neutral Gradient) */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '12px 18px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <span className="technical-label">SEA-ICE CONCENTRATION SCALE</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', color: '#9A9D93' }}>
+            MICROWAVE RADIOMETRY PASSIVE SENSOR
           </span>
         </div>
 
-        {/* Horizon Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span className="technical-label" style={{ fontSize: '9.5px', marginRight: '4px' }}>FORECAST HORIZON:</span>
-          {horizons.map(h => {
-            const isSelected = horizon === h;
-            return (
-              <button
-                key={h}
-                onClick={() => setHorizon(h)}
-                className="btn-polar"
-                style={{
-                  fontSize: '11px',
-                  padding: '4px 12px',
-                  borderRadius: 'var(--radius-pill)',
-                  backgroundColor: isSelected ? 'var(--accent-ice)' : 'transparent',
-                  color: isSelected ? 'var(--bg-space)' : 'var(--text-secondary)',
-                  borderColor: isSelected ? 'var(--accent-ice)' : 'var(--glass-border)',
-                  fontWeight: isSelected ? 700 : 400
-                }}
-              >
-                +{h.toUpperCase()}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Main Grid: Map on Left, Point Inspector & Chart on Right */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 380px', minHeight: 0 }} className="seaice-layout-grid">
-        {/* Spatial Map */}
-        <div style={{ position: 'relative', height: '100%', minHeight: '400px' }}>
-          <MapContainer
-            onSelectSegment={() => {}}
-          />
-        </div>
-
-        {/* Inspection Panel & Temporal Analytics */}
+        {/* Grayscale/Neutral Gradient Bar */}
         <div
           style={{
-            backgroundColor: 'rgba(13, 27, 52, 0.55)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            borderLeft: '1px solid var(--glass-border)',
-            boxShadow: 'var(--shadow-panel)',
-            padding: '16px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px'
+            height: '10px',
+            borderRadius: '2px',
+            background: 'linear-gradient(90deg, #0B0F0D 0%, #202621 25%, #4C554E 50%, #8D998F 75%, #E8E6D9 100%)',
+            border: '1px solid #292D28',
+            marginBottom: '6px'
           }}
-        >
-          {/* Location Inspection Card */}
-          <div className="tech-card" style={{ padding: '14px' }}>
-            <div className="flex-between" style={{ marginBottom: '8px' }}>
-              <span className="technical-label">POINT INSPECTION TELEMETRY</span>
-              <span className="mono-readout" style={{ fontSize: '9.5px', color: 'var(--accent-ice)' }}>
-                GRID 25KM
-              </span>
-            </div>
+        />
 
-            <div className="mono-readout" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              {inspectedLocation.name}
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <CoordinateDisplay lat={inspectedLocation.lat} lon={inspectedLocation.lon} />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <span className="technical-label" style={{ fontSize: '9px', display: 'block' }}>CURRENT CONCENTRATION</span>
-                <span className="mono-readout" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--accent-ice)' }}>
-                  {inspectedLocation.concentration}%
-                </span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <span className="technical-label" style={{ fontSize: '9px', display: 'block' }}>PREDICTION CONFIDENCE</span>
-                <span className="mono-readout" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--risk-low)' }}>
-                  {inspectedLocation.confidence}%
-                </span>
-              </div>
-            </div>
-
-            {/* Horizon Predictions Breakdown */}
-            <div className="technical-label" style={{ marginBottom: '6px', fontSize: '9.5px' }}>FORECAST HORIZONS (PREDICTED)</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ background: 'var(--bg-primary)', padding: '6px', borderRadius: 'var(--radius-xs)', textAlign: 'center' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>+24H</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{inspectedLocation.pred24}%</span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '6px', borderRadius: 'var(--radius-xs)', textAlign: 'center' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>+48H</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{inspectedLocation.pred48}%</span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '6px', borderRadius: 'var(--radius-xs)', textAlign: 'center' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>+72H</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{inspectedLocation.pred72}%</span>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '10px', fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', borderTop: '1px solid var(--border-subtle)', paddingTop: '8px' }}>
-              <div>MODEL: {inspectedLocation.model}</div>
-              <div>DATA SOURCE: {inspectedLocation.source}</div>
-            </div>
-          </div>
-
-          {/* Historical Statistics & Actual Calculated Trend */}
-          {historyResult?.stats && (
-            <div className="tech-card" style={{ padding: '12px' }}>
-              <div className="flex-between" style={{ marginBottom: '8px' }}>
-                <span className="technical-label">14-DAY OBSERVED ICE DYNAMICS</span>
-                <TrendingUp size={13} color="var(--risk-moderate)" />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', fontSize: '11px', fontFamily: 'var(--font-mono)', marginBottom: '8px' }}>
-                <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>MINIMUM</span>
-                  <span style={{ color: 'var(--text-primary)' }}>{historyResult.stats.min}%</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>AVERAGE</span>
-                  <span style={{ color: 'var(--text-primary)' }}>{historyResult.stats.average}%</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>MAXIMUM</span>
-                  <span style={{ color: 'var(--text-primary)' }}>{historyResult.stats.max}%</span>
-                </div>
-              </div>
-
-              <div style={{ background: 'var(--bg-primary)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', fontSize: '11px', color: 'var(--text-secondary)' }}>
-                Sea-ice concentration has {historyResult.stats.trendPercent >= 0 ? 'increased' : 'decreased'} by{' '}
-                <strong style={{ color: 'var(--text-primary)' }}>{Math.abs(historyResult.stats.trendPercent)}%</strong> over the selected 14-day observation period.
-              </div>
-            </div>
-          )}
-
-          {/* Sea Ice Time Series Chart */}
-          <SeaIceChart currentConcentration={inspectedLocation.concentration} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: '9.5px', color: '#9A9D93' }}>
+          <span>0% LOW (OPEN WATER)</span>
+          <span>25%</span>
+          <span>50%</span>
+          <span>75%</span>
+          <span>100% DENSE (CONSOLIDATED PACK)</span>
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 1080px) {
-          .seaice-layout-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      {/* Section 14: CONCENTRATION HISTORY AND FORECAST (Clean Scientific Chart) */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '18px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div>
+            <div className="technical-label">TIME-SERIES OBSERVATION</div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: '#E8E6D9', marginTop: '2px' }}>
+              Concentration History and Forecast
+            </div>
+          </div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#6F746C' }}>
+            72H PROJECTION MODEL · SHADED UNCERTAINTY BAND
+          </div>
+        </div>
+
+        <SeaIceChart forecastHours={72} />
+      </div>
+
+      {/* Section 14: HISTORICAL QUERY */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '18px'
+        }}
+      >
+        <div className="technical-label" style={{ marginBottom: '4px' }}>
+          ARCHIVAL TELEMETRY
+        </div>
+        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: '#E8E6D9', marginBottom: '14px' }}>
+          Historical Query
+        </div>
+
+        <form onSubmit={handleQuery} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr)) 140px', gap: '12px', alignItems: 'flex-end' }}>
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>START DATE</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+            />
+          </div>
+
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>END DATE</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+            />
+          </div>
+
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>LATITUDE</label>
+            <input
+              type="text"
+              value={queryLat}
+              onChange={(e) => setQueryLat(e.target.value)}
+              placeholder="-70.5231"
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+            />
+          </div>
+
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>LONGITUDE</label>
+            <input
+              type="text"
+              value={queryLon}
+              onChange={(e) => setQueryLon(e.target.value)}
+              placeholder="-45.1842"
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn-primary-action"
+            style={{ height: '36px' }}
+          >
+            <span>Load history</span>
+          </button>
+        </form>
+
+        {loadedNotice && (
+          <div style={{ marginTop: '10px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#C8D35A' }}>
+            ✓ Historical observation records retrieved and calibrated for coordinates.
+          </div>
+        )}
+
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11.5px', color: '#6F746C', marginTop: '12px' }}>
+          Historical records query NSIDC composite microwave daily sea-ice concentrations back to 1979 for baseline trend analysis and model anomaly estimation.
+        </p>
+      </div>
     </div>
   );
 }

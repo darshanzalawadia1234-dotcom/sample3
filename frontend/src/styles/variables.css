@@ -1,123 +1,96 @@
 :root {
   /* =========================================================================
-     POLARNEXUS — Polar Operations Deck Design Tokens (from DESIGN.md)
+     ANTARCTIC DECISION SUPPORT SYSTEM — Scientific Operations Console Tokens
+     Visual Direction: Dark, Scientific, Technical, Minimal, Mission-Control
      ========================================================================= */
 
-  /* Abyssal Foundation & Surface Layering */
-  --surface-deep: #040914;
-  --surface-mid: #081325;
-  --surface-elevated: #0f1d36;
-  --surface-overlay: rgba(15, 29, 54, 0.72);
-  --surface-modal: rgba(4, 9, 20, 0.94);
+  /* 1. Core Abyssal Charcoal Foundation */
+  --bg-primary: #0B0D0C;
+  --bg-secondary: #0D100E;
+  --bg-tertiary: #121512;
+  --bg-space: #070908;
 
-  --bg-space: #010d26;
-  --bg-primary: #04132c;
-  --bg-secondary: #0d1b34;
-  --bg-tertiary: #111f38;
-  --surface-base: #111f38;
-  --surface-subtle: #27354f;
+  --surface-base: #121512;
+  --surface-mid: #151915;
+  --surface-elevated: #181C18;
+  --surface-overlay: rgba(18, 21, 18, 0.92);
+  --surface-highlight: #1D231D;
 
-  /* Material Design 3 Tactical Surface Tokens */
-  --surface-dim: #04132c;
-  --surface-bright: #2c3953;
-  --surface-container-lowest: #010d26;
-  --surface-container-low: #0d1b34;
-  --surface-container: #111f38;
-  --surface-container-high: #1c2a43;
-  --surface-container-highest: #27354f;
+  /* 2. Restrained Color Palette */
+  /* Primary Accent: Muted Pale Yellow / Chartreuse */
+  --accent-primary: #C8D35A;
+  --accent-chartreuse: #C8D35A;
+  --accent-olive: #8A963E;
+  --accent-olive-bg: rgba(200, 211, 90, 0.08);
+  --accent-olive-active: rgba(200, 211, 90, 0.15);
 
-  /* Text & Readability (Luminance preserving dark adaptation) */
-  --on-surface: #d8e2ff;
-  --on-surface-variant: #bdc8d1;
-  --text-primary: #f0f6fc;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --text-inverse: #04132c;
+  /* Legacy variable mappings to maintain component compatibility */
+  --accent-cyan: #C8D35A;
+  --accent-ocean: #C8D35A;
+  --accent-ice: #E8E6D9;
+  --accent-ice-dim: rgba(200, 211, 90, 0.1);
+  --primary: #C8D35A;
+  --secondary: #9A9D93;
 
-  /* Polar Signal & Telemetry Tiers (Primary / Secondary) */
-  --primary: #8ed5ff;
-  --primary-container: #38bdf8;
-  --on-primary: #00354a;
-  --secondary: #89ceff;
-  --secondary-container: #00a2e6;
-  --accent-cyan: #38bdf8;
-  --accent-ocean: #0ea5e9;
-  --accent-trench: #0284c7;
-  --accent-ice: #7bd0ff;
-  --accent-ice-dim: rgba(56, 189, 248, 0.16);
+  /* Text: Warm Off-White to Muted Gray-Green */
+  --text-primary: #E8E6D9;
+  --text-secondary: #9A9D93;
+  --text-muted: #6F746C;
+  --text-inverse: #0B0D0C;
 
-  /* Polar Alert Tier (Tertiary, Semantic & Warning) */
-  --tertiary: #ffc174;
-  --tertiary-container: #f59e0b;
-  --risk-low: #10b981;
-  --risk-low-bg: rgba(16, 185, 129, 0.14);
-  --risk-moderate: #f59e0b;
-  --risk-moderate-bg: rgba(245, 158, 11, 0.15);
-  --risk-high: #ffb4ab;
-  --risk-high-bg: rgba(255, 180, 171, 0.16);
-  --risk-critical: #ef4444;
-  --risk-critical-bg: rgba(239, 68, 68, 0.22);
-  --error: #ffb4ab;
-  --error-container: #93000a;
+  /* Borders: 1px Low-contrast Gray-Green */
+  --border-subtle: #292D28;
+  --border-medium: #30352F;
+  --border-structural: #292D28;
+  --border-accent: #C8D35A;
 
-  /* Structural Outlines & Radar Graticules */
-  --outline: #87929a;
-  --outline-variant: #3e484f;
-  --border-structural: rgba(30, 41, 59, 0.75);
-  --border-subtle: rgba(56, 189, 248, 0.14);
-  --border-medium: rgba(56, 189, 248, 0.28);
-  --border-accent: #38bdf8;
+  /* Warning / Hazard Tier: Restrained Red-Orange */
+  --warning-hazard: #D85C3E;
+  --risk-critical: #D85C3E;
+  --risk-critical-bg: rgba(216, 92, 62, 0.15);
+  --risk-moderate: #C8D35A;
+  --risk-moderate-bg: rgba(200, 211, 90, 0.12);
+  --risk-low: #8A963E;
+  --risk-low-bg: rgba(138, 150, 62, 0.15);
 
-  /* Instrumental Glassmorphism */
-  --glass-bg: rgba(15, 29, 54, 0.72);
-  --glass-bg-hover: rgba(28, 42, 67, 0.82);
-  --glass-bg-active: rgba(39, 53, 79, 0.9);
-  --glass-border: rgba(56, 189, 248, 0.18);
-  --glass-border-hover: rgba(56, 189, 248, 0.45);
-  --glass-blur: blur(12px);
-  --glass-blur-lg: blur(20px);
-  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 16px 0 rgba(56, 189, 248, 0.05);
+  /* Map Specific Colors */
+  --map-bg: #0B0F0D;
+  --map-ice-mass: #161B17;
+  --map-ice-edge: #E8E6D9;
+  --map-route-recommended: #C8D35A;
+  --map-route-hazard: #D85C3E;
+  --map-grid-line: rgba(111, 116, 108, 0.15);
 
-  /* Typography Stacks */
-  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: var(--font-body);
+  /* Glass/Card Minimal Surfaces (NO excessive glassmorphism or blur) */
+  --glass-bg: #121512;
+  --glass-bg-hover: #151915;
+  --glass-border: #292D28;
+  --glass-border-hover: #383E36;
+  --glass-blur: none;
+  --glass-specular: none;
 
-  /* Tactical Soft Technical Corner Radii (roundedness: 1) */
+  /* 3. Typography Stacks */
+  --font-serif: 'Cormorant Garamond', 'Instrument Serif', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+
+  /* 4. Minimal Corners (4-6px) */
   --radius-xs: 2px;
   --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-pill: 9999px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-pill: 4px; /* Strictly avoid rounded pill buttons */
 
   /* Dimensions */
-  --header-height: 54px;
-  --strip-height: 38px;
-  --sidebar-width: 250px;
-  --sidebar-collapsed-width: 62px;
-  --bottom-strip-height: 44px;
+  --sidebar-width: 230px;
+  --sidebar-collapsed-width: 58px;
+  --header-height: 48px;
+  --strip-height: 36px;
 
-  /* Elevation Shadows */
-  --shadow-panel: 0 8px 32px 0 rgba(1, 9, 20, 0.65), 0 2px 6px 0 rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.22);
-  --shadow-threat: 0 0 0 1px #ef4444, inset 0 0 16px rgba(239, 68, 68, 0.18);
-}
-
-/* High Contrast Mode */
-[data-contrast="high"] {
-  --surface-deep: #00040a;
-  --surface-mid: #020815;
-  --surface-elevated: #061226;
-  --border-structural: #475569;
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-}
-
-/* Reduced Motion */
-[data-reduced-motion="true"] * {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001ms !important;
+  /* Elevation Shadows (Restrained, technical, no heavy shadows) */
+  --shadow-panel: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
 }

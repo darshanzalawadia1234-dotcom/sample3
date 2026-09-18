@@ -1,170 +1,188 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { useMapState } from '../context/MapContext';
-import { Sliders, Save, RefreshCw, Eye, Compass, Shield, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 export default function Settings() {
-  const { settings, updateSettings, systemStatus } = useApp();
-  const { activeLayers, toggleLayer } = useMapState();
+  const { settings, updateSettings } = useApp();
+  const [activeTab, setActiveTab] = useState('SYSTEM');
+  const [savedNotice, setSavedNotice] = useState(false);
+
+  const sections = ['ACCOUNT', 'SYSTEM', 'DATA SOURCES', 'NOTIFICATIONS', 'DISPLAY', 'SECURITY'];
+
+  const handleSave = () => {
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 2500);
+  };
 
   return (
-    <div style={{ flex: 1, padding: '20px 28px', backgroundColor: 'var(--bg-primary)', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: '20px' }}>
-        <div className="technical-label">SYSTEM CONFIGURATION & OPERATIONAL PREFERENCES</div>
-        <h2 className="mono-readout" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-          POLAR WORKSTATION SETTINGS
-        </h2>
+      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
+        <div className="page-eyebrow">CONSOLE PARAMETERS</div>
+        <h1 className="page-title-serif" style={{ fontSize: '32px' }}>System settings</h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+          Configure operational telemetry feeds, coordinate formats, risk thresholds, and operator security keys.
+        </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-        {/* GENERAL UNITS & FORMATS */}
-        <div className="tech-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="technical-label" style={{ color: 'var(--accent-ice)' }}>UNITS OF MEASUREMENT & CARTOGRAPHY</div>
+      {/* Tabs matching Section 23 */}
+      <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid #292D28', paddingBottom: '10px' }}>
+        {sections.map((s) => (
+          <button
+            key={s}
+            onClick={() => setActiveTab(s)}
+            style={{
+              background: activeTab === s ? '#151915' : 'transparent',
+              color: activeTab === s ? '#C8D35A' : '#9A9D93',
+              border: `1px solid ${activeTab === s ? '#C8D35A' : 'transparent'}`,
+              borderRadius: '2px',
+              padding: '6px 14px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              fontWeight: activeTab === s ? 600 : 400,
+              cursor: 'pointer'
+            }}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
 
-          <div>
-            <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Distance Unit</label>
-            <select
-              value={settings.unitDistance}
-              onChange={e => updateSettings({ unitDistance: e.target.value })}
-              className="input-polar"
-            >
-              <option value="km">Kilometers (km) - Metric</option>
-              <option value="nm">Nautical Miles (NM) - Maritime Standard</option>
-            </select>
-          </div>
+      {/* Section Content */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '24px',
+          maxWidth: '680px'
+        }}
+      >
+        {activeTab === 'SYSTEM' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="technical-label">NAVIGATION & GEODESY SETTINGS</div>
 
-          <div>
-            <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Fuel Measurement</label>
-            <select
-              value={settings.unitFuel}
-              onChange={e => updateSettings({ unitFuel: e.target.value })}
-              className="input-polar"
-            >
-              <option value="L">Liters (L) - Volume</option>
-              <option value="t">Metric Tonnes (t) - Marine Bunker Weight</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Geographic Coordinate Display Format</label>
-            <select
-              value={settings.coordinateFormat}
-              onChange={e => updateSettings({ coordinateFormat: e.target.value })}
-              className="input-polar"
-            >
-              <option value="dms">Degrees, Minutes & Cardinal (e.g. 64°32.4'S, 042°18.7'E)</option>
-              <option value="decimal">Signed Decimal Degrees (e.g. -64.5400, -42.3117)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="technical-label" style={{ display: 'block', marginBottom: '4px' }}>Default Sea-Ice Forecast Horizon</label>
-            <select
-              value={settings.defaultForecast}
-              onChange={e => updateSettings({ defaultForecast: e.target.value })}
-              className="input-polar"
-            >
-              <option value="12h">+12 Hours</option>
-              <option value="24h">+24 Hours (Standard Watch)</option>
-              <option value="48h">+48 Hours</option>
-              <option value="72h">+72 Hours</option>
-              <option value="5d">+5 Days</option>
-            </select>
-          </div>
-        </div>
-
-        {/* CARTOGRAPHY & MAP LAYERS PRESETS */}
-        <div className="tech-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="technical-label" style={{ color: 'var(--accent-ice)' }}>CARTOGRAPHIC LAYER PRESETS</div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <span>Show Polar Coordinate Graticule Grid</span>
-              <input
-                type="checkbox"
-                checked={activeLayers.graticule}
-                onChange={() => toggleLayer('graticule')}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <span>Show Sea-Ice Current Concentration</span>
-              <input
-                type="checkbox"
-                checked={activeLayers.seaIceCurrent}
-                onChange={() => toggleLayer('seaIceCurrent')}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <span>Show Tracked Iceberg Positions</span>
-              <input
-                type="checkbox"
-                checked={activeLayers.icebergPositions}
-                onChange={() => toggleLayer('icebergPositions')}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <span>Show Iceberg Predicted Drift Trajectories</span>
-              <input
-                type="checkbox"
-                checked={activeLayers.icebergTrajectories}
-                onChange={() => toggleLayer('icebergTrajectories')}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <span>Show Proximity Hazard Envelopes</span>
-              <input
-                type="checkbox"
-                checked={activeLayers.hazardZones}
-                onChange={() => toggleLayer('hazardZones')}
-              />
-            </label>
-          </div>
-        </div>
-
-        {/* ACCESSIBILITY & DISPLAY */}
-        <div className="tech-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="technical-label" style={{ color: 'var(--accent-ice)' }}>ACCESSIBILITY & WORKSTATION DISPLAY</div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <div>
-                <div>High Contrast Polar Mode</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Maximizes border delineation for low-light night watch</div>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.highContrast}
-                onChange={e => updateSettings({ highContrast: e.target.checked })}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '12px' }}>
-              <div>
-                <div>Reduced Motion Mode</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Disables trajectory line dash animations & radar sweeps</div>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.reducedMotion}
-                onChange={e => updateSettings({ reducedMotion: e.target.checked })}
-              />
-            </label>
-          </div>
-
-          <div style={{ marginTop: '14px', padding: '10px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-            <div style={{ color: 'var(--text-muted)', marginBottom: '4px' }}>DATA MODE:</div>
-            <div style={{ color: systemStatus.dataMode === 'LIVE' ? 'var(--risk-low)' : 'var(--risk-moderate)', fontWeight: 600 }}>
-              {systemStatus.dataMode}
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>DISTANCE MEASUREMENT</label>
+              <select
+                value={settings.unitDistance || 'km'}
+                onChange={(e) => updateSettings({ unitDistance: e.target.value })}
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                <option value="km">Kilometers (km) - Polar Geodesic Metric</option>
+                <option value="nm">Nautical Miles (NM) - IMO SOLAS Standard</option>
+              </select>
             </div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Persistent storage active in browser localStorage.
+
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>COORDINATE FORMAT</label>
+              <select
+                value={settings.coordinateFormat || 'dms'}
+                onChange={(e) => updateSettings({ coordinateFormat: e.target.value })}
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                <option value="dms">Degrees, Minutes & Cardinal (64°31.4'S 41°18.7'E)</option>
+                <option value="decimal">Signed Decimal Degrees (-64.5231, 41.3117)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>DEFAULT CHART DATUM</label>
+              <input
+                type="text"
+                disabled
+                value="WGS 84 (World Geodetic System 1984 - Polar Stereographic EPSG:3031)"
+                style={{ fontFamily: 'var(--font-mono)', opacity: 0.8 }}
+              />
             </div>
           </div>
+        )}
+
+        {activeTab === 'ACCOUNT' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="technical-label">OPERATOR PROFILE</div>
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>OPERATOR NAME</label>
+              <input type="text" defaultValue="Dr. Sarah Evans" />
+            </div>
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>AFFILIATION</label>
+              <input type="text" defaultValue="British Antarctic Survey / R/V Polarstern" />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'DATA SOURCES' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="technical-label">REMOTE SENSING INGESTION PIPELINES</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
+              <div className="flex-between" style={{ borderBottom: '1px solid #222621', paddingBottom: '8px' }}>
+                <span>Sentinel-1 SAR Satellite Imagery (ESA Copernicus)</span>
+                <span style={{ color: '#C8D35A', fontFamily: 'var(--font-mono)' }}>ACTIVE · 10m/px</span>
+              </div>
+              <div className="flex-between" style={{ borderBottom: '1px solid #222621', paddingBottom: '8px' }}>
+                <span>AMSR2 Microwave Sea-Ice Concentration (JAXA)</span>
+                <span style={{ color: '#C8D35A', fontFamily: 'var(--font-mono)' }}>ACTIVE · 12.5km</span>
+              </div>
+              <div className="flex-between" style={{ borderBottom: '1px solid #222621', paddingBottom: '8px' }}>
+                <span>HYCOM Global 0.08° Ocean Current Kinematics</span>
+                <span style={{ color: '#C8D35A', fontFamily: 'var(--font-mono)' }}>ACTIVE · 3-hourly</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'NOTIFICATIONS' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="technical-label">TACTICAL THREAT NOTIFICATIONS</div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px' }}>
+              <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px', accentColor: '#C8D35A' }} />
+              <span>Audio proximity alert on iceberg CPA &lt; 2.0 NM</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px' }}>
+              <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px', accentColor: '#C8D35A' }} />
+              <span>Pack compaction alert when sea ice convergence exceeds 15% / 6h</span>
+            </label>
+          </div>
+        )}
+
+        {activeTab === 'DISPLAY' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="technical-label">CONSOLE GRAPHICS</div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px' }}>
+              <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px', accentColor: '#C8D35A' }} />
+              <span>Display subtle navigation coordinate grid</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px' }}>
+              <input type="checkbox" defaultChecked style={{ width: '16px', height: '16px', accentColor: '#C8D35A' }} />
+              <span>Enable continuous background ambient drift animation</span>
+            </label>
+          </div>
+        )}
+
+        {activeTab === 'SECURITY' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="technical-label">ENCRYPTION & SATELLITE COMMS</div>
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>BRIDGE ACCESS PASSKEY</label>
+              <input type="password" defaultValue="••••••••••••" />
+            </div>
+            <div>
+              <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>IRIDIUM SATELLITE BURST SIGNING</label>
+              <input type="text" disabled value="ECDSA SHA-256 (Bridge Key ID: 0x48FA1B)" style={{ fontFamily: 'var(--font-mono)' }} />
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '24px', borderTop: '1px solid #222621', paddingTop: '16px' }}>
+          <button onClick={handleSave} className="btn-primary-action">
+            <span>Save settings</span>
+          </button>
+          {savedNotice && (
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#C8D35A', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Check size={14} /> Saved
+            </span>
+          )}
         </div>
       </div>
     </div>

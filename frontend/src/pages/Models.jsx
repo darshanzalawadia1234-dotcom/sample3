@@ -1,103 +1,121 @@
 import React from 'react';
-import { Cpu, CheckCircle2, AlertCircle, Info, ShieldCheck, Database } from 'lucide-react';
-import Metric from '../components/common/Metric';
-import { MOCK_MODELS } from '../api/mockData';
 
 export default function Models() {
+  const models = [
+    {
+      category: 'FORECAST MODEL',
+      name: 'Numerical Polar Metocean Predictor',
+      version: 'v2.4.1',
+      lastTrained: '2026-08-15 UTC',
+      confidence: '89.4%',
+      inputSources: 'ECMWF IFS, ERA5 Reanalysis, GFS Polar High-Res',
+      status: 'OPERATIONAL'
+    },
+    {
+      category: 'ICE CONCENTRATION MODEL',
+      name: 'Deep Cryosphere CNN Regressor',
+      version: 'v3.1.0',
+      lastTrained: '2026-09-02 UTC',
+      confidence: '92.1%',
+      inputSources: 'Sentinel-1 SAR, AMSR2 Radiometry, MODIS Cryo Albedo',
+      status: 'OPERATIONAL'
+    },
+    {
+      category: 'ICEBERG TRAJECTORY MODEL',
+      name: 'Coupled Lagrangian Drift Dynamics',
+      version: 'v1.8.4',
+      lastTrained: '2026-08-28 UTC',
+      confidence: '86.7%',
+      inputSources: 'CMEMS HYCOM 0.08° Velocity Fields, Scatterometer Wind Vectors',
+      status: 'CALIBRATED'
+    },
+    {
+      category: 'ROUTE OPTIMIZATION MODEL',
+      name: 'Pareto-Frontier Multi-Objective A*',
+      version: 'v2.0.2',
+      lastTrained: '2026-09-10 UTC',
+      confidence: '94.8%',
+      inputSources: 'Polar Code PC1-PC7 Hull Curves, In-Situ Depth Soundings, Bathymetry',
+      status: 'ACTIVE'
+    }
+  ];
+
   return (
-    <div style={{ flex: 1, padding: '20px 28px', backgroundColor: 'var(--bg-primary)', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: '20px' }}>
-        <div className="technical-label">ALGORITHMIC TRANSPARENCY & VALIDATION</div>
-        <h2 className="mono-readout" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-          DECISION-SUPPORT AI MODEL SPECIFICATIONS & BENCHMARKS
-        </h2>
+      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
+        <div className="page-eyebrow">ALGORITHMIC PROVENANCE & MONITORING</div>
+        <h1 className="page-title-serif" style={{ fontSize: '32px' }}>Predictive Models</h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+          Verification metrics, training timestamps, sensor pipelines, and operational status for all deployed algorithms.
+        </p>
       </div>
 
-      {/* Model Confidence Notice Banner */}
-      <div
-        className="tech-card"
-        style={{
-          padding: '14px 16px',
-          backgroundColor: 'rgba(116, 179, 206, 0.08)',
-          border: '1px solid var(--border-tech)',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '12px'
-        }}
-      >
-        <Info size={18} color="var(--accent-ice)" style={{ flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-          <strong>SCIENTIFIC CONFIDENCE NOTICE:</strong> Prediction confidence scores represent the numerical model's estimated statistical reliability based on historical validation residuals, sensor coverage density, and satellite revisit latency. Confidence indicators should not be interpreted as an absolute maritime safety guarantee. Final route execution is subject to Master discretion and real-time polar watchkeeping.
-        </div>
-      </div>
-
-      {/* Model Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
-        {MOCK_MODELS.map(model => (
-          <div key={model.id} className="tech-card" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      {/* Model Sections Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '16px' }}>
+        {models.map((m, idx) => (
+          <div
+            key={idx}
+            style={{
+              backgroundColor: '#121512',
+              border: '1px solid #292D28',
+              borderRadius: 'var(--radius-sm)',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px'
+            }}
+          >
             <div className="flex-between">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Cpu size={16} color="var(--accent-ice)" />
-                <span className="mono-readout" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  {model.name}
-                </span>
-              </div>
+              <span className="technical-label" style={{ color: '#C8D35A' }}>{m.category}</span>
               <span
-                className="mono-readout"
                 style={{
+                  fontFamily: 'var(--font-mono)',
                   fontSize: '9.5px',
-                  color: 'var(--risk-low)',
-                  background: 'var(--risk-low-bg)',
-                  border: '1px solid var(--risk-low)',
+                  fontWeight: 600,
+                  color: '#8A963E',
+                  backgroundColor: 'rgba(138, 150, 62, 0.15)',
                   padding: '2px 6px',
-                  borderRadius: 'var(--radius-xs)'
+                  borderRadius: '2px'
                 }}
               >
-                {model.version} · {model.status}
+                ● {m.status}
               </span>
             </div>
 
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
-              <strong>Architecture:</strong> {model.type}
-            </div>
-
-            <div style={{ background: 'var(--bg-primary)', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-              <div className="technical-label" style={{ fontSize: '9px', marginBottom: '4px' }}>REGRESSION TARGET</div>
-              <div style={{ fontSize: '11px', color: 'var(--accent-ice)', fontFamily: 'var(--font-mono)' }}>
-                {model.target}
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '15px', fontWeight: 600, color: '#E8E6D9' }}>
+                {m.name}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#9A9D93', marginTop: '2px' }}>
+                VERSION: {m.version} · LAST TRAINED: {m.lastTrained}
               </div>
             </div>
 
-            {/* Validation Metrics Grid */}
-            <div>
-              <div className="technical-label" style={{ marginBottom: '6px' }}>EMPIRICAL VALIDATION BENCHMARKS</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                {Object.entries(model.metrics).map(([key, val]) => (
-                  <div key={key} style={{ background: 'var(--bg-primary)', padding: '6px 8px', borderRadius: 'var(--radius-xs)' }}>
-                    <span className="technical-label" style={{ fontSize: '8.5px', display: 'block' }}>{key.toUpperCase()}</span>
-                    <span className="mono-readout" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                      {val}
-                    </span>
-                  </div>
-                ))}
+            {/* Technical Key-Values */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', borderTop: '1px solid #222621', paddingTop: '12px', fontFamily: 'var(--font-mono)' }}>
+              <div>
+                <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>CONFIDENCE RATING</div>
+                <div style={{ color: '#C8D35A', fontSize: '15px', fontWeight: 600, marginTop: '2px' }}>
+                  {m.confidence}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.1em' }}>VALIDATION METRIC</div>
+                <div style={{ color: '#E8E6D9', fontSize: '12px', marginTop: '2px' }}>
+                  RMSE: 0.042 / R² 0.94
+                </div>
               </div>
             </div>
 
-            {/* Feature Inputs */}
-            <div>
-              <div className="technical-label" style={{ marginBottom: '6px' }}>INPUT FEATURE WEIGHTS & ATTRIBUTES</div>
-              <ul style={{ paddingLeft: '16px', fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                {model.features.map((f, i) => (
-                  <li key={i}>{f}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-              <span>TRAINING HORIZON: {model.trainingPeriod}</span>
-              <span>CALIBRATED: {model.metrics.sampleCount}</span>
+            <div style={{ borderTop: '1px solid #222621', paddingTop: '10px' }}>
+              <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}>
+                INPUT DATA SOURCES
+              </div>
+              <div style={{ color: '#9A9D93', fontSize: '11.5px', fontFamily: 'var(--font-sans)', marginTop: '2px' }}>
+                {m.inputSources}
+              </div>
             </div>
           </div>
         ))}

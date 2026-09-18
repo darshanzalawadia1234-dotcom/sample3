@@ -1,47 +1,42 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MapContainer from '../components/map/MapContainer';
-import ExpeditionTimeline from '../components/navigation/ExpeditionTimeline';
-import ThreatBanner from '../components/icebergs/ThreatBanner';
-import VectorDriftIndicator from '../components/navigation/VectorDriftIndicator';
-import IceConcentrationBar from '../components/icebergs/IceConcentrationBar';
 import IcebergDetailDrawer from '../components/icebergs/IcebergDetailDrawer';
-import Metric from '../components/common/Metric';
-import RiskBadge from '../components/common/RiskBadge';
 import { useApp } from '../context/AppContext';
 import { useIcebergs } from '../hooks/useIcebergs';
 import { useRoute } from '../hooks/useRoute';
 import {
-  Ship,
-  Compass,
+  AlertTriangle,
+  Check,
   ArrowRight,
-  ShieldAlert,
-  Anchor,
-  Radio,
-  Wind,
-  Waves,
-  Crosshair,
-  Layers
+  Compass,
+  Layers,
+  Ship,
+  Wind
 } from 'lucide-react';
 import { MOCK_WEATHER, MOCK_OCEAN } from '../api/mockData';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { selectedShip, selectShipForNavigation } = useApp();
-  const { icebergs, alerts } = useIcebergs();
+  const { selectedShip } = useApp();
+  const { icebergs } = useIcebergs();
   const { routeResult, selectedRoute } = useRoute();
 
   const [inspectedIceberg, setInspectedIceberg] = useState(null);
-  const [threatDismissed, setThreatDismissed] = useState(false);
 
-  // Determine active threat notice
-  const primaryAlert = alerts[0] || routeResult.proximityAlert;
+  // Timeline points matching Section 13
+  const timelinePoints = [
+    { label: 'NOW', time: '18:00 UTC', ice: '15%', wind: '14 kn SW', status: 'active' },
+    { label: '+6 HOURS', time: '00:00 UTC', ice: '24%', wind: '18 kn W', status: 'upcoming' },
+    { label: '+12 HOURS', time: '06:00 UTC', ice: '42%', wind: '22 kn WNW', status: 'upcoming' },
+    { label: '+24 HOURS', time: '18:00 UTC', ice: '31%', wind: '16 kn NW', status: 'upcoming' },
+    { label: '+48 HOURS', time: '18:00 UTC', ice: '18%', wind: '12 kn N', status: 'upcoming' },
+    { label: 'DESTINATION', time: 'ETA 72h', ice: '<10%', wind: '9 kn NE', status: 'terminal' }
+  ];
 
-  const handleLaunchNavigation = () => {
-    if (selectedShip) {
-      selectShipForNavigation(selectedShip);
-    }
-    navigate('/navigation');
+  const handleInspectHazard = () => {
+    const berg = icebergs.find((b) => b.id.includes('017') || b.id.includes('A-')) || icebergs[0];
+    if (berg) setInspectedIceberg(berg);
   };
 
   return (
@@ -50,79 +45,64 @@ export default function Dashboard() {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
         minHeight: 0,
-        position: 'relative',
-        zIndex: 1
+        backgroundColor: 'transparent',
+        position: 'relative'
       }}
     >
-      {/* Top Pinned Threat Strobe Banner if proximity alert is active */}
-      {primaryAlert && !threatDismissed && (
-        <div style={{ padding: '8px 14px 0 14px' }}>
-          <ThreatBanner
-            targetId={primaryAlert.icebergId || 'A-76A'}
-            cpaNm={primaryAlert.distanceNm ? (primaryAlert.distanceNm).toFixed(1) : '1.4'}
-            tcpaMinutes={primaryAlert.timeToImpactHours ? Math.round(primaryAlert.timeToImpactHours * 60) : 42}
-            bearing={primaryAlert.bearing || 198}
-            driftSpeed={1.8}
-            severity={primaryAlert.severity || 'critical'}
-            onAcknowledge={() => setThreatDismissed(true)}
-            onInspect={() => {
-              const matched = icebergs.find((b) => b.id === primaryAlert.icebergId);
-              if (matched) setInspectedIceberg(matched);
-            }}
-          />
-        </div>
-      )}
-
-      {/* Main 24-Column Tactical Deck Grid */}
+      {/* Main Grid: Large Map + Information Panels */}
       <div
         style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1fr 370px',
+          gridTemplateColumns: '1fr 360px',
           minHeight: 0,
-          position: 'relative',
-          padding: '8px 12px 0 12px',
-          gap: '10px'
+          position: 'relative'
         }}
-        className="dashboard-grid"
+        className="dashboard-main-grid"
       >
-        {/* CENTER / LEFT: Dominant Geospatial Polar Cartography View */}
+        {/* LEFT: Large Antarctic Sea-Ice Scientific Map Visualization */}
         <div
           style={{
             position: 'relative',
             height: '100%',
-            minHeight: '440px',
-            borderRadius: 'var(--radius-md)',
-            overflow: 'hidden',
-            border: '1px solid var(--border-structural)',
-            boxShadow: 'var(--shadow-panel)'
+            minHeight: '480px',
+            backgroundColor: 'var(--map-bg)',
+            overflow: 'hidden'
           }}
         >
-          {/* HUD Top Bar Overlay */}
+          {/* Scientific Map Legend Overlay */}
           <div
             style={{
               position: 'absolute',
-              top: '12px',
-              left: '12px',
+              top: '16px',
+              left: '16px',
               zIndex: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'rgba(4, 9, 20, 0.82)',
-              backdropFilter: 'var(--glass-blur)',
-              border: '1px solid var(--border-structural)',
-              borderRadius: 'var(--radius-xs)',
-              padding: '4px 10px'
+              backgroundColor: 'rgba(13, 16, 14, 0.92)',
+              border: '1px solid #292D28',
+              borderRadius: '2px',
+              padding: '10px 14px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '10px'
             }}
           >
-            <span className="led-pip led-cyan" />
-            <span className="label-sm" style={{ color: '#ffffff' }}>ANTARCTIC SECTOR 4</span>
-            <span style={{ color: 'var(--text-muted)' }}>|</span>
-            <span className="telemetry-value" style={{ fontSize: '11px', color: 'var(--accent-cyan)' }}>
-              WGS 84 POLAR STEREOGRAPHIC
-            </span>
+            <div style={{ color: '#6F746C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              CHART LEGEND · WGS 84
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '16px', height: '2px', backgroundColor: '#C8D35A', display: 'inline-block' }} />
+                <span style={{ color: '#E8E6D9' }}>Recommended Route</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '16px', height: '2px', backgroundColor: '#D85C3E', display: 'inline-block' }} />
+                <span style={{ color: '#E8E6D9' }}>Hazard Corridor</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '16px', height: '2px', borderBottom: '1px dashed #E8E6D9', display: 'inline-block' }} />
+                <span style={{ color: '#9A9D93' }}>Ice Edge Boundary</span>
+              </div>
+            </div>
           </div>
 
           <MapContainer
@@ -132,7 +112,6 @@ export default function Dashboard() {
             highlightedRouteId={selectedRoute?.id || 'balanced'}
           />
 
-          {/* Iceberg Telemetry Detail Drawer */}
           {inspectedIceberg && (
             <IcebergDetailDrawer
               iceberg={inspectedIceberg}
@@ -141,250 +120,266 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* RIGHT: Instrumental Tactical Telemetry & Decision Console */}
+        {/* RIGHT: Operations Intelligence Panels */}
         <div
           style={{
-            backgroundColor: 'var(--glass-bg)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            border: '1px solid var(--border-structural)',
-            borderRadius: 'var(--radius-md)',
-            boxShadow: 'var(--shadow-panel), var(--glass-specular)',
-            padding: '14px',
+            backgroundColor: '#0D100E',
+            borderLeft: '1px solid #292D28',
+            padding: '18px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px'
+            gap: '16px'
           }}
-          className="dashboard-intel-panel"
+          className="dashboard-side-panel"
         >
-          {/* Active Flagship Vessel Card */}
+          {/* Section 10: HAZARD PANEL */}
           <div
             style={{
-              background: 'var(--surface-mid)',
-              border: '1px solid var(--border-structural)',
+              backgroundColor: '#121512',
+              border: '1px solid #292D28',
               borderRadius: 'var(--radius-sm)',
-              padding: '12px'
+              padding: '14px'
             }}
           >
             <div className="flex-between" style={{ marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Ship size={14} color="var(--accent-cyan)" />
-                <span className="label-sm" style={{ color: 'var(--accent-cyan)' }}>FLAGSHIP STATUS</span>
-              </div>
-              <span className="telemetry-chip" style={{ height: '20px', padding: '0 6px', fontSize: '9.5px', color: 'var(--risk-low)' }}>
-                <span className="led-pip led-green" />
-                {selectedShip?.status || 'IN TRANSIT'}
-              </span>
-            </div>
-
-            <div
-              className="mono-readout"
-              style={{
-                fontSize: '15px',
-                fontWeight: 700,
-                color: '#ffffff',
-                letterSpacing: '0.04em',
-                marginBottom: '4px'
-              }}
-            >
-              {selectedShip?.name || 'R/V Polarstern'}
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '10px',
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--text-secondary)',
-                marginBottom: '10px'
-              }}
-            >
-              <span>ICE CLASS: <strong style={{ color: 'var(--accent-ice)' }}>{selectedShip?.iceClass || 'PC3'}</strong></span>
-              <span>·</span>
-              <span>DEST: <strong style={{ color: '#ffffff' }}>{selectedShip?.destination || 'Rothera Station'}</strong></span>
-            </div>
-
-            {/* Quick SOG & Bunker Gauges */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '6px',
-                fontSize: '11px',
-                fontFamily: 'var(--font-mono)'
-              }}
-            >
-              <div style={{ background: 'var(--surface-deep)', padding: '6px 8px', borderRadius: 'var(--radius-xs)', border: '1px solid rgba(71,85,105,0.3)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '8.5px', display: 'block' }}>SPEED OVER GROUND (SOG)</span>
-                <span style={{ color: '#ffffff', fontWeight: 600 }}>{selectedShip?.normalSpeed || 11.2} kn</span>
-              </div>
-              <div style={{ background: 'var(--surface-deep)', padding: '6px 8px', borderRadius: 'var(--radius-xs)', border: '1px solid rgba(71,85,105,0.3)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '8.5px', display: 'block' }}>REMAINING BUNKER FUEL</span>
-                <span style={{ color: 'var(--accent-ice)', fontWeight: 600 }}>88% (840k L)</span>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-              <button
-                onClick={handleLaunchNavigation}
-                className="btn-engage"
-                style={{ flex: 1, padding: '7px 10px', fontSize: '11px' }}
-              >
-                <span>Plan Waypoint</span>
-                <ArrowRight size={13} />
-              </button>
-              <Link
-                to="/auth"
-                className="btn-tactical"
-                style={{ padding: '7px 10px', fontSize: '11px', textDecoration: 'none' }}
-                title="Manage Vessel Credentials"
-              >
-                <Anchor size={13} />
-              </Link>
-            </div>
-          </div>
-
-          {/* Vector Drift Indicator (Specialized Polar Component) */}
-          <VectorDriftIndicator
-            heading={214}
-            driftAngle={226}
-            driftSpeedKnots={2.4}
-            sog={selectedShip?.normalSpeed || 11.2}
-            size={136}
-          />
-
-          {/* WMO Sea Ice Concentration Micro-Gauge (Specialized Polar Component) */}
-          <IceConcentrationBar
-            concentration={0.65}
-            stageOfDevelopment="Medium First-Year (70-120cm)"
-            form="Big Floe (500-2000m)"
-          />
-
-          {/* Synoptic In-Situ Metocean Readouts */}
-          <div
-            style={{
-              background: 'var(--surface-mid)',
-              border: '1px solid var(--border-structural)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '12px'
-            }}
-          >
-            <div className="flex-between" style={{ marginBottom: '8px' }}>
-              <span className="label-sm" style={{ color: 'var(--text-muted)' }}>SYNOPTIC METOCEAN CONDITIONS</span>
-              <span className="telemetry-chip" style={{ height: '18px', padding: '0 4px', fontSize: '8.5px', color: 'var(--accent-cyan)' }}>
-                IN-SITU
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-              <Metric
-                label="AIR TEMP"
-                value={`${MOCK_WEATHER.airTemperature}`}
-                unit="°C"
-                secondary="SST: -1.6°C"
-              />
-              <Metric
-                label="WIND VECTOR"
-                value={`${MOCK_WEATHER.windSpeed}`}
-                unit="kn"
-                secondary={`${MOCK_WEATHER.windDirectionText} ${MOCK_WEATHER.windDirectionDegrees}°`}
-              />
-              <Metric
-                label="BAROMETER"
-                value={`${Math.round(MOCK_WEATHER.barometricPressure)}`}
-                unit="hPa"
-                secondary="Falling 1.2 hPa/3h"
-              />
-              <Metric
-                label="SIGNIFICANT WAVE"
-                value={`${MOCK_OCEAN.significantWaveHeight}`}
-                unit="m"
-                secondary="Period: 8.5s"
-              />
-            </div>
-          </div>
-
-          {/* Active Recommended Tactical Route */}
-          {selectedRoute && (
-            <div
-              style={{
-                background: 'var(--surface-mid)',
-                border: '1px solid var(--border-structural)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '12px'
-              }}
-            >
-              <div className="flex-between" style={{ marginBottom: '6px' }}>
-                <span className="label-sm" style={{ color: 'var(--text-muted)' }}>ACTIVE ROUTE MATRIX</span>
-                <RiskBadge score={selectedRoute.riskScore} category={selectedRoute.riskCategory} size="sm" />
-              </div>
-
-              <div
-                className="mono-readout"
+              <span className="technical-label">HAZARD STATE</span>
+              <span
                 style={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  color: selectedRoute.color || 'var(--accent-ice)',
-                  marginBottom: '6px'
-                }}
-              >
-                {selectedRoute.name}
-              </div>
-
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   gap: '4px',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  marginBottom: '6px'
+                  fontSize: '9.5px',
+                  fontWeight: 600,
+                  color: '#D85C3E'
                 }}
               >
-                <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '8px', display: 'block' }}>DIST</span>
-                  <span style={{ color: '#ffffff', fontWeight: 600 }}>{selectedRoute.distanceKm} km</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '8px', display: 'block' }}>FUEL</span>
-                  <span style={{ color: '#ffffff', fontWeight: 600 }}>{selectedRoute.estimatedFuelLiters} L</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '8px', display: 'block' }}>TRANSIT</span>
-                  <span style={{ color: '#ffffff', fontWeight: 600 }}>{selectedRoute.travelTimeHours} h</span>
+                <AlertTriangle size={12} color="#D85C3E" />
+                ICEBERG PROXIMITY
+              </span>
+            </div>
+
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12.5px', color: '#E8E6D9', lineHeight: 1.5, margin: '6px 0 12px 0' }}>
+              <strong style={{ color: '#E8E6D9' }}>A-017</strong> projected within 18.4 km of route in 14h 20m.
+            </p>
+
+            <button
+              onClick={handleInspectHazard}
+              className="btn-secondary"
+              style={{ width: '100%', fontSize: '11.5px', padding: '6px 12px' }}
+            >
+              View on map
+            </button>
+          </div>
+
+          {/* Section 11: RECOMMENDED ACTION */}
+          <div
+            style={{
+              backgroundColor: '#121512',
+              border: '1px solid #292D28',
+              borderRadius: 'var(--radius-sm)',
+              padding: '14px'
+            }}
+          >
+            <div className="flex-between" style={{ marginBottom: '8px' }}>
+              <span className="technical-label">RECOMMENDED ACTION</span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '9px',
+                  fontWeight: 600,
+                  color: '#8A963E',
+                  backgroundColor: 'rgba(138, 150, 62, 0.15)',
+                  padding: '2px 6px',
+                  borderRadius: '2px'
+                }}
+              >
+                LOW RISK · 31/100
+              </span>
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 600, color: '#E8E6D9', marginBottom: '6px' }}>
+              Maintain eastern corridor
+            </div>
+
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#9A9D93', lineHeight: 1.5 }}>
+              Avoid the compacting ice edge west of waypoint 04. Reassess at +12 hours.
+            </p>
+          </div>
+
+          {/* Section 12: ROUTE DECISION PANEL */}
+          <div
+            style={{
+              backgroundColor: '#121512',
+              border: '1px solid #292D28',
+              borderRadius: 'var(--radius-sm)',
+              padding: '14px'
+            }}
+          >
+            <div className="technical-label" style={{ marginBottom: '8px' }}>
+              ROUTE DECISION
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#9A9D93', marginBottom: '10px' }}>
+              Why this route?
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11.5px', color: '#E8E6D9' }}>
+                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
+                <span>Lower iceberg exposure</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11.5px', color: '#E8E6D9' }}>
+                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
+                <span>Avoids dense sea ice</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11.5px', color: '#E8E6D9' }}>
+                <Check size={14} color="#C8D35A" style={{ marginTop: '2px', flexShrink: 0 }} />
+                <span>Acceptable additional travel time</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/navigation')}
+              className="btn-primary-action"
+              style={{ width: '100%', marginTop: '14px', fontSize: '11.5px', padding: '7px 12px' }}
+            >
+              <span>Inspect Profile & Waypoints</span>
+              <ArrowRight size={13} />
+            </button>
+          </div>
+
+          {/* Environmental Observations Panel (Section 9) */}
+          <div
+            style={{
+              backgroundColor: '#121512',
+              border: '1px solid #292D28',
+              borderRadius: 'var(--radius-sm)',
+              padding: '14px'
+            }}
+          >
+            <div className="technical-label" style={{ marginBottom: '10px' }}>
+              IN-SITU OBSERVATIONS
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
+                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>AIR TEMP</div>
+                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+                  -18.4 °C
                 </div>
               </div>
 
-              <p style={{ fontSize: '10.5px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                {selectedRoute.summary}
-              </p>
+              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
+                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>WIND</div>
+                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+                  SW 18.2 kn
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
+                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>PRESSURE</div>
+                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+                  978 hPa
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#0B0D0C', border: '1px solid #222621', padding: '8px 10px', borderRadius: '2px' }}>
+                <div style={{ color: '#6F746C', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>WAVES</div>
+                <div style={{ color: '#E8E6D9', fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 600, marginTop: '2px' }}>
+                  2.1 m
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* BOTTOM: Fluid Acoustic & Expedition Timeline Scrubber */}
+      {/* Section 13: EXPEDITION TIMELINE */}
       <div
         style={{
-          borderTop: '1px solid var(--border-structural)',
-          backgroundColor: 'rgba(4, 9, 20, 0.9)',
-          padding: '2px 8px'
+          borderTop: '1px solid #292D28',
+          backgroundColor: '#0B0D0C',
+          padding: '12px 24px'
         }}
       >
-        <ExpeditionTimeline timeline={routeResult.timeline} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div className="technical-label">EXPEDITION TIMELINE</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', color: '#6F746C' }}>
+            WAYPOINTS 01 – 06 · ROUTE DELTA: +1.8h
+          </div>
+        </div>
+
+        <div
+          style={{
+            position: 'relative',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: '12px'
+          }}
+        >
+          {/* Horizontal Connecting Line */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '8px',
+              left: '5%',
+              right: '5%',
+              height: '1px',
+              backgroundColor: '#292D28',
+              zIndex: 1
+            }}
+          />
+
+          {timelinePoints.map((pt, idx) => (
+            <div
+              key={idx}
+              style={{
+                position: 'relative',
+                zIndex: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center'
+              }}
+            >
+              <div
+                style={{
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '50%',
+                  backgroundColor: pt.status === 'active' ? '#C8D35A' : '#151915',
+                  border: `1.5px solid ${pt.status === 'active' ? '#C8D35A' : '#6F746C'}`,
+                  marginBottom: '8px',
+                  boxShadow: pt.status === 'active' ? '0 0 6px #C8D35A' : 'none'
+                }}
+              />
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9.5px', fontWeight: 600, color: pt.status === 'active' ? '#C8D35A' : '#E8E6D9' }}>
+                {pt.label}
+              </div>
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8.5px', color: '#6F746C', marginTop: '2px' }}>
+                {pt.time}
+              </div>
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8.5px', color: '#9A9D93', marginTop: '4px' }}>
+                ICE: {pt.ice} · {pt.wind}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <style>{`
-        @media (max-width: 1080px) {
-          .dashboard-grid {
+        @media (max-width: 1024px) {
+          .dashboard-main-grid {
             grid-template-columns: 1fr !important;
           }
-          .dashboard-intel-panel {
+          .dashboard-side-panel {
             border-left: none !important;
-            border-top: 1px solid var(--border-structural);
+            border-top: 1px solid #292D28;
           }
         }
       `}</style>

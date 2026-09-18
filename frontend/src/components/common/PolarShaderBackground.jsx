@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * WebGL Polar Deep Oceanic Aurora Background Shader
- * Directly ported from reference_design/stitch_polaris_dss_antarctic_operations_platform-2/code.html
- * Provides real-time simplex noise Antarctic oceanic depths, glacial aurora flows,
- * analog telemetry film grain, and radar instrumentation depth vignette.
+ * Continuous WebGL Background Shader
+ * Retuned to match the ANTARCTIC DECISION SUPPORT SYSTEM theme:
+ * Charcoal/abyssal base (#0B0D0C) with subtle, continuous moving
+ * muted chartreuse/yellow-green (#C8D35A) flows and fine scientific telemetry grain.
  */
-export default function PolarShaderBackground({ opacity = 0.85, interactive = true }) {
+export default function PolarShaderBackground({ opacity = 0.65, interactive = true }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -77,29 +77,29 @@ export default function PolarShaderBackground({ opacity = 0.85, interactive = tr
         vec2 uv = v_texCoord;
         float ratio = u_resolution.x / max(u_resolution.y, 1.0);
         vec2 p = uv * vec2(ratio, 1.0);
-        float t = u_time * 0.16;
-        float n1 = snoise(p * 0.45 + t);
-        float n2 = snoise(p * 0.90 - t * 0.35 + n1);
+        float t = u_time * 0.14;
+        float n1 = snoise(p * 0.42 + t);
+        float n2 = snoise(p * 0.85 - t * 0.32 + n1);
         
-        float light = pow(abs(n2), 2.4) * 0.65; 
+        float light = pow(abs(n2), 2.8) * 0.55; 
         
-        // Antarctic Polar Deep Oceanic Base Abyss (#04132c, #010d26)
-        vec3 col = vec3(0.015, 0.075, 0.17); 
+        // Charcoal Antarctic Base (#0B0D0C / #080B09)
+        vec3 col = vec3(0.043, 0.051, 0.047); 
         
-        // Theme Cyan & Polar Glacial Aurora Flow (#0284c7, #38bdf8, #0ea5e9)
-        vec3 themeColor1 = vec3(0.01, 0.52, 0.78); // #0284c7
-        vec3 themeColor2 = vec3(0.22, 0.74, 0.97); // #38bdf8
+        // Theme Colors: Muted Olive (#56632B) & Chartreuse (#C8D35A)
+        vec3 themeOlive = vec3(0.24, 0.28, 0.12);
+        vec3 themeChartreuse = vec3(0.78, 0.83, 0.35);
         
-        col += themeColor1 * smoothstep(0.08, 0.95, n1) * 0.55;
-        col += themeColor2 * light * 0.85;
+        col += themeOlive * smoothstep(0.12, 0.92, n1) * 0.48;
+        col += themeChartreuse * light * 0.45;
 
-        // Scientific analog film grain for polar telemetry feel
+        // Scientific fine analog film grain for polar telemetry feel
         float grain = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453 + u_time);
-        col += (grain - 0.5) * 0.035;
+        col += (grain - 0.5) * 0.025;
         
-        // Vignette for radar instrumentation depth
+        // Subtle technical vignette
         float dist = length(uv - 0.5);
-        col *= smoothstep(1.3, 0.25, dist);
+        col *= smoothstep(1.35, 0.25, dist);
         gl_FragColor = vec4(col, 1.0);
       }
     `;

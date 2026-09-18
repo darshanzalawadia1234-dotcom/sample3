@@ -1,361 +1,260 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, ShieldCheck, Layers, TriangleAlert, ArrowRight, Radio, ExternalLink } from 'lucide-react';
+import { ArrowRight, Compass, ShieldAlert, Layers, Activity, ChevronDown } from 'lucide-react';
 import { formatUtcDateTime } from '../utils/formatting';
 
 export default function Landing() {
-  const currentUtc = formatUtcDateTime();
+  const [utcTime, setUtcTime] = useState(formatUtcDateTime());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setUtcTime(formatUtcDateTime());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'transparent', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Polar System Status Header */}
-      <header
-        style={{
-          borderBottom: '1px solid var(--glass-border)',
-          padding: '14px 28px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'rgba(13, 27, 52, 0.55)',
-          backdropFilter: 'var(--glass-blur)',
-          WebkitBackdropFilter: 'var(--glass-blur)',
-          boxShadow: 'var(--shadow-panel)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '28px',
-              height: '28px',
-              border: '1.5px solid var(--accent-ice)',
-              borderRadius: 'var(--radius-xs)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(123, 208, 255, 0.15)',
-              boxShadow: '0 0 10px rgba(123, 208, 255, 0.3)'
-            }}
-          >
-            <Radio size={15} color="var(--accent-ice)" />
-          </div>
-          <div>
-            <div className="mono-readout" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-primary)' }}>
-              ANTARCTIC RESEARCH EXPEDITIONS
-            </div>
-            <div className="technical-label" style={{ fontSize: '9px', color: 'var(--accent-ice)' }}>
-              SOUTHERN OCEAN MARITIME DECISION SUPPORT PLATFORM
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span className="status-indicator status-online" />
-            <span style={{ color: 'var(--text-primary)' }}>OPERATIONAL STATUS: READY</span>
-          </div>
-          <div style={{ color: 'var(--text-muted)' }}>{currentUtc}</div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
+    <div style={{ minHeight: '100vh', backgroundColor: '#0B0D0C', color: '#E8E6D9', display: 'flex', flexDirection: 'column' }}>
+      {/* Cinematic Hero Viewport */}
       <div
         style={{
-          flex: 1,
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '32px',
-          padding: '48px 36px',
-          alignItems: 'center',
-          maxWidth: '1480px',
-          margin: '0 auto',
-          width: '100%'
+          position: 'relative',
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '24px 36px',
+          overflow: 'hidden'
         }}
-        className="hero-grid"
       >
-        {/* Left: Purpose and Mission */}
-        <div>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px',
-              backgroundColor: 'rgba(56, 189, 248, 0.1)',
-              border: '1px solid var(--glass-border)',
-              borderRadius: 'var(--radius-pill)',
-              backdropFilter: 'blur(8px)',
-              marginBottom: '18px'
-            }}
-          >
-            <span className="status-indicator status-online" style={{ width: '6px', height: '6px' }} />
-            <span className="technical-label" style={{ color: 'var(--accent-ice)' }}>
-              POLAR RESEARCH & MARITIME SAFETY INITIATIVE
-            </span>
+        {/* Background Antarctic Aerial Landscape Image with Dark Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=2400&q=80')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 40%',
+            filter: 'brightness(0.32) contrast(1.15) desaturate(0.4)',
+            zIndex: 0
+          }}
+        />
+
+        {/* Subtle Dark Gradient & Grid Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(11,13,12,0.85) 0%, rgba(11,13,12,0.4) 40%, rgba(11,13,12,0.92) 100%), radial-gradient(circle at 20% 40%, rgba(200,211,90,0.06) 0%, transparent 60%)',
+            zIndex: 1
+          }}
+        />
+
+        {/* Top Header Bar */}
+        <header
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(41, 45, 40, 0.6)',
+            paddingBottom: '16px'
+          }}
+        >
+          {/* Top-Left: Small Square Logo Box "A·D" + Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                background: '#121512',
+                border: '1px solid #C8D35A',
+                color: '#C8D35A',
+                display: 'grid',
+                placeItems: 'center',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.05em'
+              }}
+            >
+              A·D
+            </div>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', color: '#E8E6D9', lineHeight: 1.2 }}>
+                ANTARCTIC
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.14em', color: '#9A9D93' }}>
+                DECISION SUPPORT
+              </div>
+            </div>
+          </div>
+
+          {/* Top-Right: Status Text with Yellow-Green Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#9A9D93' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#C8D35A', boxShadow: '0 0 6px #C8D35A' }} />
+            <span>EXPEDITION CONSOLE · 74.3°S 145.9°E</span>
+          </div>
+        </header>
+
+        {/* Hero Content Positioned Toward Left */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            maxWidth: '820px',
+            margin: 'auto 0',
+            padding: '40px 0'
+          }}
+        >
+          <div className="page-eyebrow" style={{ marginBottom: '12px', fontSize: '11px' }}>
+            POLAR RESEARCH OPERATIONS
           </div>
 
           <h1
             style={{
-              fontSize: '36px',
-              fontWeight: 700,
-              lineHeight: 1.2,
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(44px, 5.5vw, 76px)',
+              fontWeight: 400,
+              lineHeight: 1.05,
               letterSpacing: '-0.02em',
-              color: 'var(--text-primary)',
-              marginBottom: '14px'
+              color: '#E8E6D9',
+              marginBottom: '20px'
             }}
           >
-            Antarctic Decision Support System
+            Antarctic Decision<br />Support System
           </h1>
 
           <p
             style={{
-              fontSize: '16px',
-              color: 'var(--text-secondary)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '17px',
               lineHeight: 1.6,
-              marginBottom: '28px',
-              maxWidth: '520px'
+              color: '#9A9D93',
+              maxWidth: '620px',
+              marginBottom: '32px'
             }}
           >
-            AI-assisted sea-ice forecasting, iceberg trajectory prediction, and safer expedition routing in the Southern Ocean.
+            AI-assisted sea-ice forecasting, iceberg trajectory prediction, and safer expedition routing across the Southern Ocean.
           </p>
 
-          {/* Operational Capability Badges */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px', maxWidth: '520px' }}>
-            <div className="glass-panel" style={{ padding: '12px 14px' }}>
-              <div className="flex-between" style={{ marginBottom: '4px' }}>
-                <span className="technical-label">SEA-ICE FORECAST</span>
-                <Layers size={14} color="var(--accent-ice)" />
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Random Forest 25km resolution pack ice predictions up to +5 days.
-              </div>
-            </div>
-
-            <div className="glass-panel" style={{ padding: '12px 14px' }}>
-              <div className="flex-between" style={{ marginBottom: '4px' }}>
-                <span className="technical-label">ICEBERG DYNAMICS</span>
-                <TriangleAlert size={14} color="var(--risk-moderate)" />
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Coupled atmospheric-oceanic Lagrangian drift cone modeling.
-              </div>
-            </div>
-
-            <div className="glass-panel" style={{ padding: '12px 14px' }}>
-              <div className="flex-between" style={{ marginBottom: '4px' }}>
-                <span className="technical-label">PARETO ROUTING</span>
-                <Compass size={14} color="var(--accent-cyan)" />
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Multi-objective route optimization balancing ice risk, fuel burn, and time.
-              </div>
-            </div>
-
-            <div className="glass-panel" style={{ padding: '12px 14px' }}>
-              <div className="flex-between" style={{ marginBottom: '4px' }}>
-                <span className="technical-label">METOCEAN FUSION</span>
-                <ShieldCheck size={14} color="var(--risk-low)" />
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Synoptic winds, Ekman ocean currents, and ice class limit checks.
-              </div>
-            </div>
-          </div>
-
-          {/* Call to Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {/* Two Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
             <Link
               to="/dashboard"
-              className="btn-polar btn-primary-action"
-              style={{ padding: '11px 22px', fontSize: '13px', borderRadius: 'var(--radius-sm)' }}
+              className="btn-primary-action"
+              style={{
+                textDecoration: 'none',
+                padding: '11px 24px',
+                fontSize: '13px'
+              }}
             >
               <span>Open Operations Dashboard</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={14} />
             </Link>
 
-            <Link
-              to="/navigation"
-              className="btn-polar"
-              style={{ padding: '11px 20px', fontSize: '13px', borderRadius: 'var(--radius-sm)' }}
+            <a
+              href="#system-details"
+              className="btn-secondary"
+              style={{
+                textDecoration: 'none',
+                padding: '11px 22px',
+                fontSize: '13px'
+              }}
             >
-              <span>Route Optimization</span>
-            </Link>
+              <span>Explore the System</span>
+              <ChevronDown size={14} />
+            </a>
           </div>
         </div>
 
-        {/* Right: Technical Polar Cartography Hero Visual */}
+        {/* Bottom Hero Horizontal System Information Strip */}
         <div
-          className="glass-panel-deep tech-corner-accent grid-subtle"
           style={{
-            height: '480px',
             position: 'relative',
-            overflow: 'hidden',
-            backgroundColor: 'rgba(1, 13, 38, 0.65)',
-            border: '1px solid var(--glass-border-hover)',
-            borderRadius: 'var(--radius-xl)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: 'var(--shadow-overlay), inset 0 1px 2px rgba(255, 255, 255, 0.15)'
+            zIndex: 10,
+            borderTop: '1px solid rgba(41, 45, 40, 0.7)',
+            paddingTop: '16px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '16px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '11px'
           }}
         >
-          {/* Antarctic Continent Vector Outline & Coordinate Rings */}
-          <svg viewBox="0 0 500 500" style={{ width: '100%', height: '100%', padding: '20px' }}>
-            {/* Graticule Concentric Latitude Circles */}
-            <circle cx="250" cy="250" r="210" fill="none" stroke="#16253E" strokeWidth="1" strokeDasharray="4 6" />
-            <circle cx="250" cy="250" r="160" fill="none" stroke="#1C2E4A" strokeWidth="1" strokeDasharray="4 6" />
-            <circle cx="250" cy="250" r="110" fill="none" stroke="#223A5E" strokeWidth="1" strokeDasharray="3 4" />
-            <circle cx="250" cy="250" r="60" fill="none" stroke="#2B4977" strokeWidth="1" strokeDasharray="2 3" />
+          <div style={{ borderLeft: '1px solid rgba(41, 45, 40, 0.7)', paddingLeft: '12px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>ACTIVE SECTOR</div>
+            <div style={{ color: '#E8E6D9', fontWeight: 600, marginTop: '2px' }}>WEDDELL / ROSS</div>
+          </div>
 
-            {/* Meridian Lines */}
-            <line x1="250" y1="40" x2="250" y2="460" stroke="#16253E" strokeWidth="1" strokeDasharray="4 6" />
-            <line x1="40" y1="250" x2="460" y2="250" stroke="#16253E" strokeWidth="1" strokeDasharray="4 6" />
-            <line x1="100" y1="100" x2="400" y2="400" stroke="#16253E" strokeWidth="0.8" strokeDasharray="2 4" />
-            <line x1="400" y1="100" x2="100" y2="400" stroke="#16253E" strokeWidth="0.8" strokeDasharray="2 4" />
+          <div style={{ borderLeft: '1px solid rgba(41, 45, 40, 0.7)', paddingLeft: '12px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>CHART DATUM</div>
+            <div style={{ color: '#E8E6D9', fontWeight: 600, marginTop: '2px' }}>WGS 84 POLAR</div>
+          </div>
 
-            {/* Continental Ice Shelf & Coastline Representation */}
-            <path
-              d="M 250 140 
-                 C 270 140, 310 160, 330 190 
-                 C 350 220, 380 240, 370 280 
-                 C 360 320, 330 350, 290 365 
-                 C 250 380, 210 375, 180 350 
-                 C 150 320, 130 290, 140 250 
-                 C 150 210, 170 170, 200 150 
-                 C 220 135, 235 140, 250 140 Z"
-              fill="rgba(116, 179, 206, 0.08)"
-              stroke="#3A5A84"
-              strokeWidth="1.5"
-            />
+          <div style={{ borderLeft: '1px solid rgba(41, 45, 40, 0.7)', paddingLeft: '12px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>MODE</div>
+            <div style={{ color: '#C8D35A', fontWeight: 600, marginTop: '2px' }}>DEMO FEED</div>
+          </div>
 
-            {/* Antarctic Peninsula Spur */}
-            <path
-              d="M 200 150 
-                 C 185 125, 170 100, 155 75 
-                 C 145 60, 135 65, 140 85 
-                 C 145 105, 160 130, 175 160 Z"
-              fill="rgba(116, 179, 206, 0.12)"
-              stroke="#5BC0BE"
-              strokeWidth="1.5"
-            />
-
-            {/* South Pole Marker */}
-            <circle cx="250" cy="250" r="3" fill="#74B3CE" />
-            <text x="256" y="254" fill="#647B95" fontSize="8" fontFamily="var(--font-mono)">90°S SOUTH POLE</text>
-
-            {/* Sea Ice Outer Limit Boundary Line */}
-            <path
-              d="M 250 70 
-                 C 330 70, 420 150, 430 250 
-                 C 440 350, 360 420, 250 430 
-                 C 140 440, 70 360, 65 250 
-                 C 60 140, 150 70, 250 70 Z"
-              fill="none"
-              stroke="#457B9D"
-              strokeWidth="1"
-              strokeDasharray="6 4"
-              opacity="0.7"
-            />
-            <text x="75" y="140" fill="#457B9D" fontSize="8" fontFamily="var(--font-mono)">SEA-ICE MARGIN (MIZ)</text>
-
-            {/* Moving Research Vessel Vector */}
-            <g transform="translate(142, 92)">
-              <polygon points="0,-7 5,6 0,3 -5,6" fill="#5BC0BE" />
-              <text x="10" y="3" fill="#E9F1F7" fontSize="9" fontFamily="var(--font-mono)" fontWeight="600">
-                R/V POLARSTERN
-              </text>
-              <text x="10" y="13" fill="#5BC0BE" fontSize="7.5" fontFamily="var(--font-mono)">
-                HDG 134° · 11.2 kn
-              </text>
-            </g>
-
-            {/* Navigation Corridor Line */}
-            <path
-              d="M 142 92 Q 170 140 185 190 T 170 230"
-              fill="none"
-              stroke="#E09F3E"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-            />
-
-            {/* Iceberg A-017 Threat Marker */}
-            <g transform="translate(172, 136)">
-              <rect x="-6" y="-6" width="12" height="12" fill="rgba(217, 83, 79, 0.3)" stroke="#D9534F" strokeWidth="1.2" transform="rotate(45)" />
-              <line x1="0" y1="0" x2="16" y2="8" stroke="#D9534F" strokeWidth="1" strokeDasharray="2 2" />
-              <text x="18" y="10" fill="#D9534F" fontSize="8" fontFamily="var(--font-mono)">
-                ICEBERG A-017 (DRIFT)
-              </text>
-            </g>
-
-            {/* Iceberg A-23a Major Tabular Marker */}
-            <g transform="translate(230, 95)">
-              <rect x="-10" y="-7" width="20" height="14" fill="rgba(200, 75, 49, 0.3)" stroke="#C84B31" strokeWidth="1.5" />
-              <text x="14" y="2" fill="#C84B31" fontSize="8" fontFamily="var(--font-mono)">
-                A-23a [TABULAR]
-              </text>
-            </g>
-
-            {/* Technical Cartographic Coordinate Labels */}
-            <text x="25" y="254" fill="#647B95" fontSize="8" fontFamily="var(--font-mono)">LON 090°W</text>
-            <text x="430" y="254" fill="#647B95" fontSize="8" fontFamily="var(--font-mono)">LON 090°E</text>
-            <text x="240" y="32" fill="#647B95" fontSize="8" fontFamily="var(--font-mono)">LON 000°</text>
-            <text x="236" y="475" fill="#647B95" fontSize="8" fontFamily="var(--font-mono)">LON 180°</text>
-          </svg>
-
-          {/* Bottom Card Overlay Strip */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              padding: '10px 16px',
-              backgroundColor: 'rgba(4, 19, 44, 0.75)',
-              backdropFilter: 'blur(8px)',
-              borderTop: '1px solid var(--glass-border-subtle)',
-              borderBottomLeftRadius: 'var(--radius-xl)',
-              borderBottomRightRadius: 'var(--radius-xl)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '10px',
-              color: 'var(--text-secondary)'
-            }}
-          >
-            <span>ANTARCTIC OPERATIONS · DECISION SUPPORT</span>
-            <span style={{ color: 'var(--accent-ice)' }}>SYSTEM RUNNING · PC3 CORRIDOR</span>
+          <div style={{ borderLeft: '1px solid rgba(41, 45, 40, 0.7)', paddingLeft: '12px' }}>
+            <div style={{ color: '#6F746C', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>UTC TIMESTAMP</div>
+            <div style={{ color: '#E8E6D9', fontWeight: 600, marginTop: '2px' }}>{utcTime}</div>
           </div>
         </div>
       </div>
 
-      {/* Footer Scientific Disclaimer */}
-      <footer
+      {/* System Overview Section Below Hero */}
+      <section
+        id="system-details"
         style={{
-          borderTop: '1px solid var(--border-subtle)',
-          padding: '16px 28px',
-          backgroundColor: 'var(--bg-secondary)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontSize: '11px',
-          color: 'var(--text-muted)'
+          padding: '64px 36px',
+          maxWidth: '1280px',
+          margin: '0 auto',
+          width: '100%',
+          borderTop: '1px solid #292D28'
         }}
       >
-        <div>
-          College AI/ML Decision Support System · Synthetic Polar Demonstration Platform
+        <div style={{ maxWidth: '640px', marginBottom: '40px' }}>
+          <div className="page-eyebrow">MISSION-CRITICAL CAPABILITIES</div>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', fontWeight: 400, color: '#E8E6D9', marginTop: '4px' }}>
+            Engineered for Extreme-Latitude Navigation
+          </h2>
         </div>
-        <div>
-          Not certified for primary navigation. Comply with IMO Polar Code & Master authority.
-        </div>
-      </footer>
 
-      <style>{`
-        @media (max-width: 960px) {
-          .hero-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+          <div className="tech-card" style={{ padding: '24px' }}>
+            <div style={{ color: '#C8D35A', fontFamily: 'var(--font-mono)', fontSize: '11px', marginBottom: '12px' }}>01 / CRYOSPHERE</div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: '#E8E6D9', marginBottom: '8px' }}>
+              Sea-Ice Concentration Models
+            </h3>
+            <p style={{ color: '#9A9D93', fontSize: '13px', lineHeight: 1.6 }}>
+              Ingests high-resolution Sentinel-1 SAR and AMSR2 microwave radiometry to forecast lead openings and floe compaction up to 72 hours in advance.
+            </p>
+          </div>
+
+          <div className="tech-card" style={{ padding: '24px' }}>
+            <div style={{ color: '#C8D35A', fontFamily: 'var(--font-mono)', fontSize: '11px', marginBottom: '12px' }}>02 / HYDRODYNAMICS</div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: '#E8E6D9', marginBottom: '8px' }}>
+              Iceberg Drift & CPA Predictor
+            </h3>
+            <p style={{ color: '#9A9D93', fontSize: '13px', lineHeight: 1.6 }}>
+              Physics-informed machine learning combines CMEMS surface currents and scatterometer wind vectors to calculate closest point of approach threat vectors.
+            </p>
+          </div>
+
+          <div className="tech-card" style={{ padding: '24px' }}>
+            <div style={{ color: '#C8D35A', fontFamily: 'var(--font-mono)', fontSize: '11px', marginBottom: '12px' }}>03 / MARITIME POLAR CODE</div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: '#E8E6D9', marginBottom: '8px' }}>
+              Multi-Objective Route Optimization
+            </h3>
+            <p style={{ color: '#9A9D93', fontSize: '13px', lineHeight: 1.6 }}>
+              A* and RRT* routing engines balance bunker fuel burn against structural ice risk according to vessel Polar Class hull ratings (PC1–PC7).
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

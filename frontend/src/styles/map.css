@@ -1,147 +1,97 @@
-/* Leaflet Map Custom Polar Ocean Theme */
+/* =========================================================================
+   Scientific Polar Map Theme (Section 24)
+   ========================================================================= */
+
 .polar-map-container {
   width: 100%;
   height: 100%;
   position: relative;
-  background-color: var(--bg-space);
+  background-color: #0B0F0D;
   overflow: hidden;
 }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #070D18 !important;
+  background: #0B0F0D !important;
   font-family: var(--font-sans) !important;
 }
 
-/* Polar dark tile invert filter for satellite/oceanic feel */
+/* Dark Scientific Tile Filter */
 .leaflet-tile {
-  filter: brightness(0.72) contrast(1.18) saturate(0.85);
+  filter: brightness(0.65) contrast(1.25) saturate(0.2) hue-rotate(85deg);
 }
 
-/* Custom Map Popups */
+/* Minimal Scientific Map Controls (+ / - / Layers) */
+.leaflet-bar {
+  border: 1px solid #292D28 !important;
+  border-radius: 2px !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  background-color: #121512 !important;
+  color: #E8E6D9 !important;
+  border-bottom: 1px solid #292D28 !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  border-radius: 0 !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #1A201A !important;
+  color: #C8D35A !important;
+}
+
+/* Popups */
 .leaflet-popup-content-wrapper {
-  background: var(--glass-bg) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--glass-border-hover) !important;
-  border-radius: var(--radius-md) !important;
-  box-shadow: var(--shadow-overlay), var(--glass-specular) !important;
-  backdrop-filter: var(--glass-blur-lg) !important;
-  -webkit-backdrop-filter: var(--glass-blur-lg) !important;
+  background: #121512 !important;
+  color: #E8E6D9 !important;
+  border: 1px solid #292D28 !important;
+  border-radius: 2px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7) !important;
   padding: 0 !important;
 }
 
 .leaflet-popup-content {
-  margin: 14px 16px !important;
-  font-size: 12px !important;
+  margin: 12px 14px !important;
+  font-size: 11.5px !important;
   line-height: 1.5 !important;
+  font-family: var(--font-mono) !important;
 }
 
 .leaflet-popup-tip {
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border);
+  background: #121512 !important;
+  border: 1px solid #292D28 !important;
 }
 
 .leaflet-container a.leaflet-popup-close-button {
-  color: var(--text-muted) !important;
-  padding: 8px 8px 0 0 !important;
+  color: #6F746C !important;
+  padding: 6px !important;
 }
 
 .leaflet-container a.leaflet-popup-close-button:hover {
-  color: var(--accent-ice) !important;
+  color: #C8D35A !important;
 }
 
-/* Map Controls Styling */
-.leaflet-bar {
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-sm) !important;
-  box-shadow: var(--shadow-panel) !important;
-  overflow: hidden;
-  backdrop-filter: var(--glass-blur) !important;
-  -webkit-backdrop-filter: var(--glass-blur) !important;
-}
-
-.leaflet-bar a {
-  background-color: rgba(17, 31, 56, 0.7) !important;
-  color: var(--text-primary) !important;
-  border-bottom: 1px solid var(--glass-border-subtle) !important;
-  transition: all 0.2s ease;
-}
-
-.leaflet-bar a:hover {
-  background-color: rgba(28, 42, 67, 0.9) !important;
-  color: var(--accent-ice) !important;
-}
-
-/* Coordinate crosshair on map bottom-right */
+/* Coordinate Overlay */
 .map-coordinate-overlay {
   position: absolute;
   bottom: 14px;
   right: 14px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill);
-  padding: 6px 14px;
+  background: rgba(18, 21, 18, 0.92);
+  border: 1px solid #292D28;
+  border-radius: 2px;
+  padding: 5px 10px;
   font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-primary);
+  font-size: 10px;
+  color: #E8E6D9;
   z-index: 1000;
   pointer-events: none;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--shadow-subtle), var(--glass-specular);
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-/* Vessel Custom SVG Marker */
-.vessel-marker-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-  transition: transform 0.2s ease;
-}
-
-.vessel-marker-icon:hover {
-  transform: scale(1.2);
-}
-
-/* Iceberg Custom SVG Marker */
-.iceberg-marker-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
-}
-
-.iceberg-marker-icon:hover {
-  transform: scale(1.25);
-}
-
-/* Trajectory projected line dashes */
-.trajectory-path {
-  stroke-dasharray: 6, 6;
-  animation: dashAnimation 30s linear infinite;
-}
-
-@keyframes dashAnimation {
-  to {
-    stroke-dashoffset: -1000;
-  }
-}
-
-/* Leaflet Attribution */
-.leaflet-control-attribution {
-  background: rgba(7, 13, 24, 0.75) !important;
-  color: var(--text-muted) !important;
-  font-size: 10px !important;
-}
-
-.leaflet-control-attribution a {
-  color: var(--accent-ice) !important;
 }

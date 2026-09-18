@@ -1,125 +1,127 @@
 import React, { useState } from 'react';
 import SeaIceChart from '../components/charts/SeaIceChart';
-import Metric from '../components/common/Metric';
-import { Clock, Calendar, Filter, Layers, TriangleAlert, CloudSun, Waves, Navigation } from 'lucide-react';
 
 export default function History() {
-  const [activeTab, setActiveTab] = useState('SEA ICE');
-  const [dateRange, setDateRange] = useState('30D');
+  const [activeTab, setActiveTab] = useState('ice');
+  const [startDate, setStartDate] = useState('2026-06-01');
+  const [endDate, setEndDate] = useState('2026-09-18');
+  const [location, setLocation] = useState('Weddell Sea Sector (70°S 45°W)');
+  const [queried, setQueried] = useState(true);
 
   const tabs = [
-    { name: 'SEA ICE', icon: Layers },
-    { name: 'ICEBERGS', icon: TriangleAlert },
-    { name: 'WEATHER', icon: CloudSun },
-    { name: 'OCEAN', icon: Waves },
-    { name: 'ROUTES', icon: Navigation }
+    { id: 'ice', label: 'ice' },
+    { id: 'icebergs', label: 'icebergs' },
+    { id: 'weather', label: 'weather' },
+    { id: 'ocean', label: 'ocean' },
+    { id: 'routes', label: 'routes' }
   ];
 
   return (
-    <div style={{ flex: 1, padding: '20px 28px', backgroundColor: 'var(--bg-primary)', overflowY: 'auto' }}>
-      {/* Header */}
-      <div className="flex-between" style={{ marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
-        <div>
-          <div className="technical-label">ANTARCTIC HISTORICAL ARCHIVE</div>
-          <h2 className="mono-readout" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-            POLAR REANALYSIS & OBSERVATION TIME SERIES
-          </h2>
-        </div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+      {/* Header matching Section 19 */}
+      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
+        <div className="page-eyebrow">OBSERVATION ARCHIVE</div>
+        <h1 className="page-title-serif" style={{ fontSize: '32px' }}>Historical data</h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#9A9D93', marginTop: '4px' }}>
+          Query recorded environmental observations and completed routing analyses.
+        </p>
+      </div>
 
-        {/* Date Filter Buttons */}
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {['7D', '14D', '30D', '90D', 'SEASON'].map(d => (
+      {/* Archive Query Panel */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '18px'
+        }}
+      >
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid #292D28', paddingBottom: '10px', marginBottom: '16px' }}>
+          {tabs.map((t) => (
             <button
-              key={d}
-              onClick={() => setDateRange(d)}
-              className="btn-polar"
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
               style={{
+                background: activeTab === t.id ? '#0B0D0C' : 'transparent',
+                color: activeTab === t.id ? '#C8D35A' : '#9A9D93',
+                border: activeTab === t.id ? '1px solid #292D28' : '1px solid transparent',
+                borderRadius: '2px',
+                padding: '6px 14px',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '11px',
-                padding: '4px 10px',
-                backgroundColor: dateRange === d ? 'var(--surface-elevated)' : 'transparent',
-                borderColor: dateRange === d ? 'var(--accent-ice)' : 'var(--border-subtle)',
-                color: dateRange === d ? 'var(--text-primary)' : 'var(--text-muted)'
+                cursor: 'pointer'
               }}
             >
-              {d}
+              {t.label}
             </button>
           ))}
         </div>
+
+        {/* Fields */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr)) 140px', gap: '12px', alignItems: 'flex-end' }}>
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>START DATE</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)' }}
+            />
+          </div>
+
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>END DATE</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)' }}
+            />
+          </div>
+
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>LOCATION</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)' }}
+            />
+          </div>
+
+          <button
+            onClick={() => setQueried(true)}
+            className="btn-primary-action"
+            style={{ height: '36px' }}
+          >
+            <span>Query archive</span>
+          </button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '8px', marginBottom: '18px' }}>
-        {tabs.map(t => {
-          const Icon = t.icon;
-          const isSelected = activeTab === t.name;
-          return (
-            <button
-              key={t.name}
-              onClick={() => setActiveTab(t.name)}
-              className="btn-polar"
-              style={{
-                padding: '6px 14px',
-                backgroundColor: isSelected ? 'var(--surface-elevated)' : 'transparent',
-                borderColor: isSelected ? 'var(--accent-ice)' : 'transparent',
-                color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)'
-              }}
-            >
-              <Icon size={14} color={isSelected ? 'var(--accent-ice)' : 'var(--text-muted)'} />
-              <span>{t.name}</span>
-            </button>
-          );
-        })}
+      {/* Large Scientific Chart */}
+      <div
+        style={{
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '20px'
+        }}
+      >
+        <div className="flex-between" style={{ marginBottom: '14px' }}>
+          <div className="technical-label">OBSERVATION TIME-SERIES · REANALYSIS</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#6F746C' }}>
+            DAILY RESOLUTION · ERA5 / NSIDC COMPOSITE
+          </div>
+        </div>
+
+        <SeaIceChart forecastHours={90} />
+
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: '#6F746C', marginTop: '16px', borderTop: '1px solid #222621', paddingTop: '10px' }}>
+          Summary values and trends are calculated only after historical observations are returned.
+        </p>
       </div>
-
-      {/* Content depending on Tab */}
-      {activeTab === 'SEA ICE' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-            <Metric label="30-DAY MIN CONCENTRATION" value="58.2%" secondary="Weddell MIZ Edge" />
-            <Metric label="30-DAY MAX CONCENTRATION" value="94.6%" secondary="Consolidated Pack" />
-            <Metric label="AVERAGE CONCENTRATION" value="73.1%" secondary="Seasonal Freeze Trend" />
-            <Metric label="NET THICKNESS RATE" value="+1.8 cm/wk" secondary="Thermodynamic Growth" />
-          </div>
-
-          <SeaIceChart />
-        </div>
-      )}
-
-      {activeTab === 'ICEBERGS' && (
-        <div className="tech-card" style={{ padding: '20px' }}>
-          <div className="technical-label" style={{ marginBottom: '10px' }}>HISTORICAL CALVING & GROUNDING EVENTS</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            Over the past 90 days, 4 major tabular detachment events were registered along the Filchner-Ronne and Larsen C ice shelves. Average northward drift speed through the Weddell Gyre was 1.28 knots, influenced by persistent southwesterly katabatic wind surges.
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'WEATHER' && (
-        <div className="tech-card" style={{ padding: '20px' }}>
-          <div className="technical-label" style={{ marginBottom: '10px' }}>SYNOPTIC POLAR BAROMETRIC REANALYSIS</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            A total of 6 severe polar low depressions passed through Drake Passage and the northern Bellingshausen Sea. Maximum sustained 10m wind speed was recorded at 52.4 knots (Gale Force 10) off South Shetland Islands.
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'OCEAN' && (
-        <div className="tech-card" style={{ padding: '20px' }}>
-          <div className="technical-label" style={{ marginBottom: '10px' }}>HYCOM SOUTHERN OCEAN GEOSTROPHIC FLUX</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            Antarctic Circumpolar Current (ACC) eastward core velocity peaked at 1.85 knots along the 60°S latitude corridor. Sea surface temperatures remained between -1.8°C and -0.4°C across all registered research sectors.
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'ROUTES' && (
-        <div className="tech-card" style={{ padding: '20px' }}>
-          <div className="technical-label" style={{ marginBottom: '10px' }}>HISTORICAL TRANSIT CORRIDOR LOGS</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            3 completed polar research voyages verified decision-support route recommendations, resulting in a documented 16.4% reduction in fuel consumption and zero hazardous proximity incidents with tabular icebergs.
-          </div>
-        </div>
-      )}
     </div>
   );
 }

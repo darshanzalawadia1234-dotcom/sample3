@@ -1,203 +1,246 @@
 import React, { useState } from 'react';
 import MapContainer from '../components/map/MapContainer';
-import RouteForm from '../components/navigation/RouteForm';
-import RouteComparison from '../components/navigation/RouteComparison';
-import DecisionExplainer from '../components/navigation/DecisionExplainer';
-import SegmentInspector from '../components/navigation/SegmentInspector';
-import RiskGauge from '../components/common/RiskGauge';
-import ProximityAlert from '../components/icebergs/ProximityAlert';
 import { useRoute } from '../hooks/useRoute';
 import { useShips } from '../hooks/useShips';
-import { useApp } from '../context/AppContext';
-import { Navigation as NavIcon, AlertTriangle, Layers, Fuel, Clock } from 'lucide-react';
+import { Play, RotateCcw, ShieldCheck, Check } from 'lucide-react';
 
 export default function Navigation() {
   const { ships } = useShips();
-  const { routeResult, selectedRoute, activeOptionId, setActiveOptionId, optimizing, optimizationStep, optimizeRoute } = useRoute();
-  const [inspectedSegmentId, setInspectedSegmentId] = useState('SEG-01');
+  const { routeResult, selectedRoute, activeOptionId, setActiveOptionId, optimizing, optimizeRoute } = useRoute();
 
-  const handleOptimize = async (params) => {
-    try {
-      await optimizeRoute(params);
-    } catch (e) {
-      console.error('Optimization error', e);
-    }
+  const [selectedVessel, setSelectedVessel] = useState(ships[0]?.name || 'RV Meridian');
+  const [safetyWeight, setSafetyWeight] = useState(70);
+  const [fuelWeight, setFuelWeight] = useState(50);
+  const [timeWeight, setTimeWeight] = useState(40);
+
+  const handleReset = () => {
+    setSafetyWeight(70);
+    setFuelWeight(50);
+    setTimeWeight(40);
   };
 
-  const shortestRoute = routeResult.options.find(r => r.id === 'shortest');
+  const handleOptimize = async () => {
+    await optimizeRoute({
+      vesselName: selectedVessel,
+      safetyWeight,
+      fuelWeight,
+      timeWeight
+    });
+  };
+
+  // Profiles from Section 15
+  const profiles = [
+    { id: 'shortest', name: 'SHORTEST', dist: '1,240 km', fuel: '142k L', time: '52.4 h', risk: 'HIGH · 72/100', riskColor: '#D85C3E' },
+    { id: 'safest', name: 'SAFEST', dist: '1,490 km', fuel: '168k L', time: '64.1 h', risk: 'LOW · 25/100', riskColor: '#8A963E' },
+    { id: 'fuel_opt', name: 'FUEL EFFICIENT', dist: '1,380 km', fuel: '138k L', time: '58.8 h', risk: 'MODERATE · 38/100', riskColor: '#C8D35A' },
+    { id: 'balanced', name: 'BALANCED', dist: '1,320 km', fuel: '148k L', time: '55.2 h', risk: 'LOW · 31/100', riskColor: '#8A963E' }
+  ];
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      {/* Top Operations Header */}
-      <div
-        style={{
-          padding: '12px 20px',
-          backgroundColor: 'rgba(13, 27, 52, 0.65)',
-          backdropFilter: 'var(--glass-blur)',
-          WebkitBackdropFilter: 'var(--glass-blur)',
-          borderBottom: '1px solid var(--glass-border)',
-          boxShadow: 'var(--shadow-panel)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <NavIcon size={15} color="var(--accent-ice)" />
-          <span className="technical-label" style={{ fontSize: '11px', color: 'var(--text-primary)' }}>
-            POLAR MARITIME NAVIGATION & PARETO ROUTE OPTIMIZATION ENGINE
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-          <span style={{ color: 'var(--text-muted)' }}>ENGINE:</span>
-          <span style={{ color: 'var(--accent-cyan)' }}>PARETO A* MULTI-OBJECTIVE</span>
-          <span style={{ color: 'var(--border-medium)' }}>|</span>
-          <span style={{ color: 'var(--text-muted)' }}>ICE RESOLUTION:</span>
-          <span style={{ color: 'var(--text-primary)' }}>25 KM GRID</span>
-        </div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0B0D0C', color: '#E8E6D9', padding: '24px 28px', gap: '20px', overflowY: 'auto' }}>
+      {/* Header */}
+      <div style={{ borderBottom: '1px solid #292D28', paddingBottom: '14px' }}>
+        <div className="page-eyebrow">POLAR NAVIGATION ENGINE</div>
+        <h1 className="page-title-serif">ROUTE PLANNING</h1>
       </div>
 
-      {/* Main Grid: Left Form, Center Map, Right Analysis */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '320px 1fr 340px', minHeight: 0 }} className="navigation-main-grid">
-        {/* LEFT: Route Planning Form */}
+      {/* Main Layout: Left Controls + Right Map */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '320px 1fr',
+          gap: '18px',
+          minHeight: '440px'
+        }}
+        className="nav-split-grid"
+      >
+        {/* LEFT: Route Controls */}
         <div
           style={{
-            backgroundColor: 'rgba(13, 27, 52, 0.55)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            borderRight: '1px solid var(--glass-border)',
-            boxShadow: 'var(--shadow-panel)',
-            padding: '16px',
-            overflowY: 'auto'
-          }}
-        >
-          <RouteForm
-            onOptimize={handleOptimize}
-            isOptimizing={optimizing}
-            currentStep={optimizationStep}
-            vessels={ships}
-          />
-        </div>
-
-        {/* CENTER: Large Interactive Antarctic Map */}
-        <div style={{ position: 'relative', height: '100%', minHeight: '400px' }}>
-          <MapContainer
-            customRoutes={routeResult.options}
-            highlightedRouteId={activeOptionId}
-            onSelectSegment={(segId) => setInspectedSegmentId(segId)}
-          />
-        </div>
-
-        {/* RIGHT: Route Decision Analysis & Risk Gauge */}
-        <div
-          style={{
-            backgroundColor: 'rgba(13, 27, 52, 0.55)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            borderLeft: '1px solid var(--glass-border)',
-            boxShadow: 'var(--shadow-panel)',
-            padding: '16px',
-            overflowY: 'auto',
+            backgroundColor: '#121512',
+            border: '1px solid #292D28',
+            borderRadius: 'var(--radius-sm)',
+            padding: '20px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px'
+            gap: '18px'
           }}
         >
-          {/* Active Proximity Hazard Alert if nearby iceberg */}
-          {routeResult.proximityAlert && (
-            <ProximityAlert alert={routeResult.proximityAlert} />
-          )}
+          <div className="technical-label">OPTIMIZATION PARAMETERS</div>
 
-          {/* Active Route Telemetry Card */}
-          <div className="tech-card" style={{ padding: '14px', borderLeft: `3px solid ${selectedRoute?.color || 'var(--accent-ice)'}` }}>
-            <div className="flex-between" style={{ marginBottom: '6px' }}>
-              <span className="technical-label">EVALUATED ROUTE CORRIDOR</span>
-              <span className="mono-readout" style={{ fontSize: '10px', color: selectedRoute?.color, fontWeight: 700 }}>
-                {selectedRoute?.type || 'RECOMMENDED'}
-              </span>
-            </div>
-
-            <div className="mono-readout" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-              {selectedRoute?.name}
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>TOTAL DISTANCE</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '15px' }}>
-                  {selectedRoute?.distanceKm} km
-                </span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>EST. TRANSIT TIME</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '15px' }}>
-                  {selectedRoute?.travelTimeHours} hrs
-                </span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>EST. BUNKER FUEL</span>
-                <span style={{ color: 'var(--accent-ice)', fontWeight: 600, fontSize: '15px' }}>
-                  {selectedRoute?.estimatedFuelLiters} L
-                </span>
-              </div>
-              <div style={{ background: 'var(--bg-primary)', padding: '8px', borderRadius: 'var(--radius-xs)' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '9px', display: 'block' }}>RISK PROFILE</span>
-                <span style={{ color: selectedRoute?.color || 'var(--risk-low)', fontWeight: 600, fontSize: '15px' }}>
-                  {selectedRoute?.riskScore} / 100
-                </span>
-              </div>
-            </div>
+          {/* Vessel Dropdown */}
+          <div>
+            <label className="technical-label" style={{ display: 'block', marginBottom: '6px' }}>VESSEL</label>
+            <select
+              value={selectedVessel}
+              onChange={(e) => setSelectedVessel(e.target.value)}
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              <option value="RV Meridian">RV Meridian (PC 5)</option>
+              <option value="R/V Polarstern">R/V Polarstern (PC 3)</option>
+              <option value="RRS Sir David Attenborough">RRS Sir David Attenborough (PC 4)</option>
+              <option value="Agulhas II">Agulhas II (PC 5)</option>
+            </select>
           </div>
 
-          {/* Risk Gauge and Factor Decomposition */}
-          <RiskGauge
-            score={selectedRoute?.riskScore || 31}
-            breakdown={selectedRoute?.riskBreakdown}
-          />
+          {/* SAFETY Slider */}
+          <div>
+            <div className="flex-between" style={{ marginBottom: '6px' }}>
+              <label className="technical-label">SAFETY WEIGHT</label>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#C8D35A' }}>{safetyWeight}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={safetyWeight}
+              onChange={(e) => setSafetyWeight(Number(e.target.value))}
+              style={{ accentColor: '#C8D35A', height: '4px', cursor: 'pointer' }}
+            />
+          </div>
 
-          {/* Decision-Support Explainer ("Why this route?") */}
-          <DecisionExplainer
-            explanation={routeResult.decisionExplanation}
-            recommendedRoute={selectedRoute}
-            shortestRoute={shortestRoute}
+          {/* FUEL Slider */}
+          <div>
+            <div className="flex-between" style={{ marginBottom: '6px' }}>
+              <label className="technical-label">FUEL WEIGHT</label>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#C8D35A' }}>{fuelWeight}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={fuelWeight}
+              onChange={(e) => setFuelWeight(Number(e.target.value))}
+              style={{ accentColor: '#C8D35A', height: '4px', cursor: 'pointer' }}
+            />
+          </div>
+
+          {/* TIME Slider */}
+          <div>
+            <div className="flex-between" style={{ marginBottom: '6px' }}>
+              <label className="technical-label">TIME WEIGHT</label>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#C8D35A' }}>{timeWeight}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={timeWeight}
+              onChange={(e) => setTimeWeight(Number(e.target.value))}
+              style={{ accentColor: '#C8D35A', height: '4px', cursor: 'pointer' }}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '10px' }}>
+            <button
+              onClick={handleOptimize}
+              disabled={optimizing}
+              className="btn-primary-action"
+              style={{ flex: 1, padding: '9px 12px' }}
+            >
+              <Play size={13} fill="#0B0D0C" />
+              <span>{optimizing ? 'Calculating...' : 'Optimize route'}</span>
+            </button>
+
+            <button
+              onClick={handleReset}
+              className="btn-secondary"
+              style={{ padding: '9px 12px' }}
+              title="Reset sliders"
+            >
+              <RotateCcw size={14} />
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT: Large Map */}
+        <div
+          style={{
+            backgroundColor: '#0B0F0D',
+            border: '1px solid #292D28',
+            borderRadius: 'var(--radius-sm)',
+            overflow: 'hidden',
+            minHeight: '440px'
+          }}
+        >
+          <MapContainer
+            customRoutes={routeResult.options}
+            highlightedRouteId={activeOptionId || 'balanced'}
           />
         </div>
       </div>
 
-      {/* BOTTOM: Route Comparison Matrix & Segment Inspector Tabs */}
+      {/* Section 15: ROUTE COMPARISON TABLE */}
       <div
         style={{
-          borderTop: '1px solid var(--border-subtle)',
-          backgroundColor: 'var(--bg-primary)',
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 1fr',
-          gap: '12px',
-          padding: '12px 14px'
+          backgroundColor: '#121512',
+          border: '1px solid #292D28',
+          borderRadius: 'var(--radius-sm)',
+          padding: '18px'
         }}
-        className="navigation-bottom-grid"
       >
-        <RouteComparison
-          routes={routeResult.options}
-          selectedRouteId={activeOptionId}
-          onSelectRoute={(id) => setActiveOptionId(id)}
-        />
+        <div className="technical-label" style={{ marginBottom: '12px' }}>
+          ROUTE COMPARISON MATRIX
+        </div>
 
-        <SegmentInspector
-          segments={routeResult.segments}
-          activeSegmentId={inspectedSegmentId}
-          onSelectSegment={(id) => setInspectedSegmentId(id)}
-        />
+        <table className="tactical-table">
+          <thead>
+            <tr>
+              <th>PROFILE</th>
+              <th>DISTANCE</th>
+              <th>FUEL</th>
+              <th>TIME</th>
+              <th>RISK</th>
+            </tr>
+          </thead>
+          <tbody>
+            {profiles.map((p) => {
+              const isSelected = (activeOptionId || 'balanced') === p.id;
+              return (
+                <tr
+                  key={p.id}
+                  onClick={() => setActiveOptionId(p.id)}
+                  style={{
+                    backgroundColor: isSelected ? 'rgba(200, 211, 90, 0.08)' : undefined,
+                    cursor: 'pointer'
+                  }}
+                  className={isSelected ? 'selected' : ''}
+                >
+                  <td style={{ fontWeight: 600, color: isSelected ? '#C8D35A' : '#E8E6D9' }}>
+                    {p.name}
+                  </td>
+                  <td>{p.dist}</td>
+                  <td>{p.fuel}</td>
+                  <td>{p.time}</td>
+                  <td>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '2px 6px',
+                        borderRadius: '2px',
+                        fontSize: '9.5px',
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 600,
+                        color: p.riskColor,
+                        backgroundColor: 'rgba(0,0,0,0.4)',
+                        border: `1px solid ${p.riskColor}40`
+                      }}
+                    >
+                      {p.risk}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
       <style>{`
-        @media (max-width: 1280px) {
-          .navigation-main-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .navigation-bottom-grid {
+        @media (max-width: 960px) {
+          .nav-split-grid {
             grid-template-columns: 1fr !important;
           }
         }
